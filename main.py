@@ -25,6 +25,7 @@ from llm_etl_pipeline import (
 
 # --- How to use it ---
 if __name__ == "__main__":
+    input_doc_path = input("Please enter the path to the directory containing the PDF documents: ")
     # CALL PAPERS DOCUMENTS HAVE MOST OF THE INFORMATION NEEDED. SO WE WILL FOCUS ON THESE. LEAVE THIS VALUE TO TRUE.
     analyze_only_call_papers=True
     ####################### IMPORTANT #######################
