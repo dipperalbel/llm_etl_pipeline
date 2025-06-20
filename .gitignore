@@ -29,7 +29,6 @@ money_result.json
 # Build artifacts
 build/
 dist/
-docs/source
 
 
 # Jupyter Notebook specific
