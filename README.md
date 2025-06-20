@@ -153,7 +153,7 @@ To use this project, you will primarily interact with its `__main__` file from y
 
 ### Output Files
 
-Upon successful completion of the process, two CSV files will be generated in your project's output directory (or the directory from which you ran the script):
+Upon successful completion of the process, two CSV files will be generated in the root directory:
 
 * `etl_money_result.csv`: Contains the extracted and processed monetary information.
 * `etl_entity_result.csv`: Contains the extracted and validated entity data.
