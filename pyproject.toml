@@ -1,0 +1,106 @@
+[project]
+name = "llm_etl_pipeline"
+version = "0.1.0"
+description = "LLM extraction from documents"
+authors = [
+    {name = "Albert Bellumat", email = "albertobellumat@gmail.com"}
+]
+maintainers = [
+    {name = "Albert Bellumat", email = "albertobellumat@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "pydantic (>=2.10.6,<3.0.0)",
+    "aiolimiter (>=1.2.1,<2.0.0)",
+    "jinja2 (>=3.1.5,<4.0.0)",
+    "loguru (>=0.7.3,<0.8.0)",
+    "python-ulid (>=3.0.0,<4.0.0)",
+    "wtpsplit-lite (>=0.1.0,<0.2.0)",
+    "litellm (>=1.68.0,<1.71.2)",
+    "docling (>=2.36.1,<3.0.0)",
+    "pymupdf (>=1.26.0,<2.0.0)",
+    "pdfplumber (>=0.11.6,<0.12.0)",
+    "langchain (>=0.3.25,<0.4.0)",
+    "langchain-community (>=0.3.25,<0.4.0)",
+    "langchain-ollama (>=0.3.3,<0.4.0)",
+    "nest-asyncio (>=1.6.0,<2.0.0)",
+    "sentence-transformers (>=4.1.0,<5.0.0)",
+    "duckduckgo-search (>=8.0.4,<9.0.0)",
+    "langchain-google-community (>=2.0.7,<3.0.0)",
+]
+license = {text = "Apache-2.0"}
+keywords = [
+    "artificial-intelligence",
+    "automated-prompting",
+    "data-extraction",
+    "document", 
+    "document-analysis",
+    "document-extraction",
+    "document-intelligence",
+    "document-parsing",
+    "document-pipeline",
+    "document-processing",
+    "document-qa",
+    "document-understanding",
+    "generative-ai",
+    "information-extraction",
+    "insights-extraction",
+    "knowledge-extraction",
+    "large-language-models",
+    "llm", 
+    "llm-extraction",
+    "llm-framework",
+    "llm-library",
+    "llm-reasoning",
+    "machine-learning",
+    "multilingual",
+    "multimodal",
+    "neural-segmentation",
+    "zero-shot",
+]
+classifiers = [
+    "Topic :: Text Processing :: General",
+]
+
+[tool.poetry]
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+coverage = "^7.6.12"
+pytest = "^8.3.4"
+pytest-cov = "^6.0.0"
+python-dotenv = "^1.0.1"
+pip-tools = "^7.4.1"
+pre-commit = "^4.1.0"
+isort = "^6.0.1"
+sphinx = ">=7.0.0,<8.0.0"
+sphinx-autodoc-typehints = "<3.0.0"
+sphinx-book-theme = "^1.1.4"
+sphinx-copybutton = "^0.5.2"
+sphinx-design = "^0.6.1"
+sphinxext-opengraph = "^0.9.1"
+nbformat = "^5.10.4"
+commitizen = "^4.5.1"
+sphinx-sitemap = "^2.6.0"
+pytest-recording = "^0.13.4"
+furo = "^2024.8.6"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.pytest.ini_options]
+addopts = "-vv -s"
+log_cli = true
+log_cli_level = "WARNING"
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

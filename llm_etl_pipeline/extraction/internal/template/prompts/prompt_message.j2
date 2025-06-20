@@ -1,0 +1,31 @@
+{% if extraction_type == "money" %}
+**Monetary Extraction Details:** You task is to extract all monetary information with a currency.
+Please extract all the explicit possible monetary information from the following {% if reference_depth == "paragraphs" %}paragraphs{% else %}sentences{% endif %} and provide it in a JSON array format. 
+Each distinct {% if reference_depth == "paragraphs" %}paragraph{% else %}sentence{% endif %} will be separated by an empty line. Also, the {% if reference_depth == "paragraphs" %}paragraphs{% else %}sentences{% endif %} below are unrelated to each other.
+
+It is possible that the input text does not have any monetary information.
+
+If no monetary details are found, do not attempt to force an extraction.
+
+Focus on monetary information with currency symbol (e.g., €, $, £, ¥) or a clear currency code (e.g., EUR, USD, GBP, JPY). Numbers associated to elements not related to currencies (e.g., points, units, pieces, percentage) MUST be ignored.
+{% endif %}
+{% if extraction_type == "entity" %}
+Your goal is to extract information about ALL organizations from the following table. This table is about the consortium composition of a call proposal. 
+
+You must identify the minimum number of entities and the types of organization you detect. You must inlcude in the ouput also those organizations that are neither Coordinators nor Beneficiaries.
+
+The minimum number of entities is indicated by the Entities row of the table: it is usually just one value, but there are cases that there are multiple values in the row.
+
+{% endif %}
+
+Text input:
+{ document_text }
+
+**Output:**
+{% if extraction_type == "money" %}
+Your output must be a JSON array. Each object in the array should represent a distinct piece of monetary information and strictly adhere to the following format.
+{% endif %}
+{% if extraction_type == "entity" %}
+Your output must strictly adhere to the following format.
+{% endif %}
+{format_instructions}

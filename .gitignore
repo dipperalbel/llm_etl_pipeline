@@ -1,0 +1,39 @@
+# Python specific
+__pycache__/
+*.pyc
+*.whl
+*.egg-info/
+.pytest_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+.idea
+
+
+# IDE specific (e.g., VS Code)
+.vscode/
+
+# Logs and output files
+logs/
+entity_result.json
+etl_entity_result.csv
+etl_money_result.csv
+money_result.json
+
+# Build artifacts
+build/
+dist/
+docs/build
+
+
+# Jupyter Notebook specific
+.ipynb_checkpoints/
+
+.DS_Store
+coverage_annotate
