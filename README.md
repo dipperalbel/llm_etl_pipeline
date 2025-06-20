@@ -124,3 +124,36 @@ List any software, libraries, or tools that need to be installed before your pro
 ```bash
 ollama pull phi4:14b
 ollama pull gemma3:27b
+```
+
+## Usage
+
+To use this project, you will primarily interact with its `__main__` file from your terminal.
+
+### Running the Extraction Process
+
+1.  **Ensure your Ollama server is running** and the required models (`phi4:14b` and `gemma3:27b`) are pulled.
+2.  **Activate your Poetry shell** (if you haven't already):
+    ```bash
+    poetry shell
+    ```
+3.  **Execute the main script:**
+    ```bash
+    poetry run python main.py 
+    ```
+    
+4.  **Provide the PDF directory path:**
+    The script will prompt you to enter the path to the directory containing your PDF documents:
+    ```
+    Please enter the path to the directory containing the PDF documents: 
+    ```
+    You should enter the full path to your PDF folder, for example:
+    * **On Windows:** `C:\path\to\your\pdf_documents`
+    * **On Linux/macOS:** `/home/user/path/to/your/pdf_documents`
+
+### Output Files
+
+Upon successful completion of the process, two CSV files will be generated in your project's output directory (or the directory from which you ran the script):
+
+* `etl_money_result.csv`: Contains the extracted and processed monetary information.
+* `etl_entity_result.csv`: Contains the extracted and validated entity data.
