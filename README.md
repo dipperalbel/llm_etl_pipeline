@@ -88,15 +88,16 @@ List any software, libraries, or tools that need to be installed before your pro
 - virtualenv 
 - poetry (recommended)
 
-### Steps
+### Install using PyPI
 
 1.  **Install the package:**
     You can install the `llm_etl_pipeline` package directly using pip:
     ```bash
     pip install llm_etl_pipeline
     ```
+### Install locally (recommended)
 
-2. **Optional: Clone the repository:**
+1. **Optional: Clone the repository:**
     Begin by cloning the project's Git repository to your local machine:
     ```bash
     git clone https://github.com/dipperalbel/llm_etl_pipeline
