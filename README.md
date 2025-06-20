@@ -64,7 +64,7 @@ Following the extraction phase, the temporarily stored JSON files are loaded int
     3.  If multiple sentences fall within the same cluster (indicating high semantic similarity for the same amount), the sentence with the *longest text* is selected as the representative for that cluster, simplifying the data while retaining context.
 
 * **Entity Data Transformation:**
-    For the extracted entity data, due to time constraints, the transformation primarily involves basic validation checks followed by a simple stacking of the dtaa extracted that contained the entity information.
+    For the extracted entity data, due to time constraints, the transformation primarily involves basic validation checks followed by a simple stacking of the data extracted that contained the entity information.
 
 * **Pipeline Orchestration:** All these transformation steps are orchestrated via a `Pipeline` class, which applies a series of pre-written functions sequentially to the `pandas` DataFrames, streamlining the data processing workflow.
  
@@ -75,3 +75,89 @@ Finally, the processed `pandas` DataFrames for monetary and organization type in
 ## Testing Strategy
 
 For quality assurance, a suite of unit tests has been developed to validate individual components and functions of the codebase. While these tests provide foundational coverage, the current test coverage stands at approximately 50%, indicating areas for future expansion.
+
+## Installation
+
+Instructions on how to get your project up and running.
+
+### Prerequisites
+
+List any software, libraries, or tools that need to be installed before your project can run. Examples:
+- Python 3.x
+- pip (usually comes with Python)
+- virtualenv 
+- poetry (recommended)
+
+### Install using PyPI
+
+1.  **Install the package:**
+    You can install the `llm_etl_pipeline` package directly using pip:
+    ```bash
+    pip install llm_etl_pipeline
+    ```
+### Install locally (recommended)
+
+1. **Clone the repository:**
+    Begin by cloning the project's Git repository to your local machine:
+    ```bash
+    git clone https://github.com/dipperalbel/llm_etl_pipeline
+    cd your-project-name
+    ```
+
+2.  **Install dependencies with Poetry:**
+    Navigate into the cloned project directory. Poetry will automatically create a virtual environment and install all project dependencies defined in `pyproject.toml` (and locked in `poetry.lock`):
+    ```bash
+    poetry install
+    ```
+    
+3.  **Activate the virtual environment (optional, but good practice):**
+    While you can run commands directly via `poetry run`, you can also activate the virtual environment managed by Poetry:
+    ```bash
+    poetry shell
+    ```
+    Once activated, your terminal prompt might change to indicate the active environment. To exit, simply type `exit`.
+
+### Ollama Model Installation
+
+**IMPORTANT:** This project requires specific LLM models to be available through your Ollama installation. After installing Ollama, you need to download `phi4:14b` and `gemma3:27b` using the Ollama command-line interface:
+
+```bash
+ollama pull phi4:14b
+ollama pull gemma3:27b
+```
+
+## Usage
+
+To use this project, you will primarily interact with its `__main__` file from your terminal.
+
+### Running the Extraction Process
+
+1.  **Ensure your Ollama server is running** and the required models (`phi4:14b` and `gemma3:27b`) are pulled.
+2.  **Activate your Poetry shell** (if you haven't already):
+    ```bash
+    poetry shell
+    ```
+3.  **Execute the main script:**
+    ```bash
+    poetry run python main.py 
+    ```
+    
+4.  **Provide the PDF directory path:**
+    The script will prompt you to enter the path to the directory containing the PDF documents. MAKE SURE THAT THE INPUT FOLDER CONTAINS THE CALL FOR PROPOSAL PDFS (the PDFs should be like AMIF-2024-TF2-AG-INFO-01_separator_call-...).
+    ```
+    Please enter the path to the directory containing the PDF documents: 
+    ```
+    You should enter the full path to your PDF folder, for example:
+    * **On Windows:** `C:\path\to\your\pdf_documents`
+    * **On Linux/macOS:** `/home/user/path/to/your/pdf_documents`
+
+### Output Files
+
+Upon successful completion of the process, two CSV files will be generated in the root directory:
+
+* `etl_money_result.csv`: Contains the extracted and processed monetary information.
+* `etl_entity_result.csv`: Contains the extracted and validated entity data.
+
+## Acknowledgments
+
+We gratefully acknowledge the work of **Shcherbak AI AS** for developing **ContextGem** (https://github.com/shcherbak-ai/contextgem). Some parts of the code for this project are based on ContexGem.
