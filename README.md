@@ -116,3 +116,10 @@ List any software, libraries, or tools that need to be installed before your pro
     ```
     Once activated, your terminal prompt might change to indicate the active environment. To exit, simply type `exit`.
 
+### Ollama Model Installation
+
+**IMPORTANT:** This project requires specific LLM models to be available through your Ollama installation. After installing Ollama, you need to download `phi4:14b` and `gemma3:27b` using the Ollama command-line interface:
+
+```bash
+ollama pull phi4:14b
+ollama pull gemma3:27b
