@@ -98,7 +98,7 @@ List any software, libraries, or tools that need to be installed before your pro
 2. **Optional: Clone the repository:**
     Begin by cloning the project's Git repository to your local machine:
     ```bash
-    git clone [[https://github.com/your-username/your-project-name.git](https://github.com/your-username/your-project-name.git)](https://github.com/dipperalbel/llm_etl_pipeline/tree/main)
+    git clone https://github.com/dipperalbel/llm_etl_pipeline
     cd your-project-name
     ```
 
