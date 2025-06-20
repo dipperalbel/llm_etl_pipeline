@@ -1,7 +1,7 @@
 Extraction Module
 =================
 
-.. automodule:: extraction.public
+.. automodule:: llm_etl_pipeline.extraction.public
    :members:
    :undoc-members:
    :show-inheritance:
