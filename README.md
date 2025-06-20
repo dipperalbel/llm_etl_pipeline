@@ -75,3 +75,43 @@ Finally, the processed `pandas` DataFrames for monetary and organization type in
 ## Testing Strategy
 
 For quality assurance, a suite of unit tests has been developed to validate individual components and functions of the codebase. While these tests provide foundational coverage, the current test coverage stands at approximately 50%, indicating areas for future expansion.
+
+## Installation
+
+Instructions on how to get your project up and running.
+
+### Prerequisites
+
+List any software, libraries, or tools that need to be installed before your project can run. Examples:
+- Python 3.x
+- pip (usually comes with Python)
+- virtualenv (recommended, if not installing globally)
+
+### Steps
+
+1.  **Install the package:**
+    You can install the `llm_etl_pipeline` package directly using pip:
+    ```bash
+    pip install llm_etl_pipeline
+    ```
+
+2. **Optional: Clone the repository:**
+    Begin by cloning the project's Git repository to your local machine:
+    ```bash
+    git clone [[https://github.com/your-username/your-project-name.git](https://github.com/your-username/your-project-name.git)](https://github.com/dipperalbel/llm_etl_pipeline/tree/main)
+    cd your-project-name
+    ```
+
+2.  **Install dependencies with Poetry:**
+    Navigate into the cloned project directory. Poetry will automatically create a virtual environment and install all project dependencies defined in `pyproject.toml` (and locked in `poetry.lock`):
+    ```bash
+    poetry install
+    ```
+    
+3.  **Activate the virtual environment (optional, but good practice):**
+    While you can run commands directly via `poetry run`, you can also activate the virtual environment managed by Poetry:
+    ```bash
+    poetry shell
+    ```
+    Once activated, your terminal prompt might change to indicate the active environment. To exit, simply type `exit`.
+
