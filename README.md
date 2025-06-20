@@ -39,7 +39,7 @@ The core of this solution for information extraction relies on a multi-stage pro
 * **Information Filtering with Regular Expressions:**
     Before LLM processing, the segmented text (primarily paragraphs, though sentence-level filtering is also an option) undergoes a crucial filtering step using Regular Expressions. These regex patterns were custom-designed based on common characteristics observed in "call for proposal" PDFs to pre-select relevant sections. This includes identifying:
     * **Monetary Amounts:** Strings containing currency indicators (e.g., "EUR") coupled with digits.
-      * **Consortium Details:** Sections typically related to consortium formation, specifically looking for the table that indicate minimum number of entities. 
+    * **Consortium Details:** Sections typically related to consortium formation, specifically looking for the table that indicate minimum number of entities. 
 
 * **LLM-based Data Extraction:**
     Once filtered, the relevant paragraphs are fed to the pre-selected local LLMs.
