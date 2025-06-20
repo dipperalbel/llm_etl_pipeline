@@ -97,7 +97,7 @@ List any software, libraries, or tools that need to be installed before your pro
     ```
 ### Install locally (recommended)
 
-1. **Optional: Clone the repository:**
+1. **Clone the repository:**
     Begin by cloning the project's Git repository to your local machine:
     ```bash
     git clone https://github.com/dipperalbel/llm_etl_pipeline
