@@ -21,6 +21,15 @@ Consequently, the solution prioritizes the extraction of available and reliable 
 
 Given that many of the provided PDFs were found to be templates or contained minimal additional data relevant to the extraction goals, the core focus of this solution was directed exclusively towards processing the "call for proposal" PDFs, as they proved to be the most valuable source of actionable information.
 
+## Project Structure
+
+The `llm_etl_pipeline` directory is organized into the following key sub-folders, each serving a distinct purpose:
+
+* **`customized_loggers/`**: This Python package is responsible for setting up and managing a customized `loguru` logger, ensuring consistent and informative logging across the project.
+* **`extraction/`**: Contains the core methods and classes dedicated to the extraction of raw data from the PDF documents, including PDF conversion and text segmentation
+* **`transformation/`**: Houses the classes and functions responsible for the transformation and validation of the data extracted by the extraction process, including data cleaning, and deduplication logic.
+* **`typings/`**: This folder contains custom type hints for Python enabling dynamic analysis checks throughout the project.
+
 ## Design Choices and Approach
 
 The core of this solution for information extraction relies on a multi-stage process leveraging local Large Language Models (LLMs) for specific data points. Our approach prioritizes accuracy and efficiency through a combination of heuristic text processing and targeted LLM inference.
