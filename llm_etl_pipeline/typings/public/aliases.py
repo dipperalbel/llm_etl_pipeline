@@ -92,7 +92,7 @@ These typically refer to pre-trained models with varying complexities (e.g., num
 """
 
 
-# --- NEW VALIDATOR FOR SaTModelId ---
+# --- TO DO: MOVE THIS FUNCITON TO INTERNAL. I CANNOT DUE IT NOW DUE CIRCULAR DEPENDENCY ---
 def _validate_sat_model_id_and_path(v: Any) -> Union[StandardSaTModelId, Path]:
     """
     Validates SaT model ID: must be a standard ID or an existing file path.

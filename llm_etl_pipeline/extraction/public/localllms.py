@@ -186,7 +186,9 @@ class LocalLLM(ChatOllama):
         # TO-DO: Instead of using the same LLM for the original chain, define a new LLM for the fallback chain in the case of error.
         fallback_chain = [RunnableLambda(_when_all_is_lost)]
         # chain = (final_prompt | self | self._parser).with_fallbacks(fallbacks=fallback_chain)
-        chain = final_prompt | self | self._parser
+        chain = (final_prompt | self | self._parser).with_fallbacks(
+            fallbacks=fallback_chain
+        )
         logger.success("LLM extraction pipeline created.")
         return chain
 
