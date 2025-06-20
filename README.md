@@ -12,7 +12,7 @@ This project operates under the following key assumptions regarding the input PD
 
 ## Solution Overview
 
-This project focuses on extracting key information from EU project-related PDF documents. During the data extraction process, it was identified that the provided PDFs, particularly those related to grant projects (e.g., AMIF), do not contain specific **Technology Readiness Level (TRL)** information. While TRL is a common concept in Horizon EU projects, the documents only offered generic definitions (TRL 1 to 9) without project-specific details. Attempts to extract TRL data, including leveraging LLM AI models (gemini), proved unsuccessful and led to hallucinations. For AMIF, it is not a practice to indicate TLR.
+This project focuses on extracting key information from EU project-related PDF documents. During the data extraction process, it was identified that the provided PDFs, AMIF grant projects, do not contain specific **Technology Readiness Level (TRL)** information. While TRL is a common concept in Horizon EU projects, the documents only offered generic definitions (TRL 1 to 9) without project-specific details. Attempts to extract TRL data, including leveraging LLM AI models (gemini), proved unsuccessful and led to hallucinations. For AMIF grant projects, it is not practice to indicate TLR.
 
 Consequently, the solution prioritizes the extraction of available and reliable data points:
 
@@ -28,13 +28,11 @@ The `llm_etl_pipeline` directory is organized into the following key sub-folders
 * **`customized_loggers/`**: This Python package is responsible for setting up and managing a customized `loguru` logger, ensuring consistent and informative logging across the project.
 * **`extraction/`**: Contains the core methods and classes dedicated to the extraction of raw data from the PDF documents, including PDF conversion and text segmentation
 * **`transformation/`**: Houses the classes and functions responsible for the transformation and validation of the data extracted by the extraction process, including data cleaning, and deduplication logic.
-* **`typings/`**: This folder contains custom type hints for Python enabling dynamic analysis checks throughout the project.
+* **`typings/`**: This folder contains custom type hints for Python enabling dynamic analysis checks throughout the project. They are used in extraction and transfromation packages.
 
 ## Design Choices and Approach
 
 The core of this solution for information extraction relies on a multi-stage process leveraging local Large Language Models (LLMs) for specific data points. Our approach prioritizes accuracy and efficiency through a combination of heuristic text processing and targeted LLM inference.
-
-* **Local LLM Models:** We utilized `phi4:14b` primarily for extracting monetary information and `gemma3:27b` for processing consortium-related table data.
 
 * **PDF to Text Conversion:**
     The process begins with converting the PDF documents into raw text strings. This is handled by the `PdfConverter` class, which internally uses the `docling` package for robust text extraction from PDF files.
@@ -56,6 +54,8 @@ The core of this solution for information extraction relies on a multi-stage pro
     * **Prompt Engineering:** User and system prompts for the LLMs are dynamically generated using a `Jinja2` template.
     * **Structured Output:** The LLM's raw output is then parsed using a `PydanticJsonParser`. This ensures that the extracted data conforms to a predefined schema, enabling robust validation and easy integration into subsequent processes. However, there is not a well defined fallback method in case of ValidationError caused by the parser.
     * **Iterative Accumulation:** This batch processing, prompting, and parsing cycle is repeated for all filtered paragraphs, and the results are accumulated to form the complete extracted dataset for the document.
+
+* **Local LLM Models:** We utilized `phi4:14b` primarily for extracting monetary information and `gemma3:27b` for processing consortium-related table data.
  
 ### Data Extraction Flow and Temporary Storage
 
