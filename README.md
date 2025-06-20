@@ -157,3 +157,7 @@ Upon successful completion of the process, two CSV files will be generated in th
 
 * `etl_money_result.csv`: Contains the extracted and processed monetary information.
 * `etl_entity_result.csv`: Contains the extracted and validated entity data.
+
+## Acknowledgments
+
+We gratefully acknowledge the work of **Shcherbak AI AS** for developing **ContextGem** (https://github.com/shcherbak-ai/contextgem), a valuable tool that contributed to the development of this project.
