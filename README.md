@@ -160,4 +160,4 @@ Upon successful completion of the process, two CSV files will be generated in th
 
 ## Acknowledgments
 
-We gratefully acknowledge the work of **Shcherbak AI AS** for developing **ContextGem** (https://github.com/shcherbak-ai/contextgem). Some parts of the code for this project are based on the project.
+We gratefully acknowledge the work of **Shcherbak AI AS** for developing **ContextGem** (https://github.com/shcherbak-ai/contextgem). Some parts of the code for this project are based on the ContexGem.
