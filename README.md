@@ -71,3 +71,7 @@ Following the extraction phase, the temporarily stored JSON files are loaded int
 ### Data Load
 
 Finally, the processed `pandas` DataFrames for monetary and organization type information are stored as CSV files: `etl_money_result.csv` for the monetary data, and `etl_entity_result.csv` for the entity data.
+
+## Testing Strategy
+
+For quality assurance, a suite of unit tests has been developed to validate individual components and functions of the codebase. While these tests provide foundational coverage, the current test coverage stands at approximately 50%, indicating areas for future expansion.
