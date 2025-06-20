@@ -85,7 +85,8 @@ Instructions on how to get your project up and running.
 List any software, libraries, or tools that need to be installed before your project can run. Examples:
 - Python 3.x
 - pip (usually comes with Python)
-- virtualenv (recommended, if not installing globally)
+- virtualenv 
+- poetry (recommended)
 
 ### Steps
 
