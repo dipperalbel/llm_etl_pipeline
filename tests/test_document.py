@@ -22,8 +22,6 @@ from llm_etl_pipeline.typings import (
     SaTModelId,
 )
 
-# --- Pytest Fixtures for Patching ---
-
 
 class TestDocument:
 
