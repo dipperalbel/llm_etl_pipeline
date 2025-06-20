@@ -143,7 +143,7 @@ To use this project, you will primarily interact with its `__main__` file from y
     ```
     
 4.  **Provide the PDF directory path:**
-    The script will prompt you to enter the path to the directory containing your PDF documents:
+    The script will prompt you to enter the path to the directory containing the PDF documents. MAKE SURE THAT THE INPUT FOLDER CONTAINS THE CALL FOR PROPOSAL PDFS (the PDFs should be like AMIF-2024-TF2-AG-INFO-01_separator_call-...).
     ```
     Please enter the path to the directory containing the PDF documents: 
     ```
