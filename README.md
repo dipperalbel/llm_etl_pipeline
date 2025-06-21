@@ -53,6 +53,10 @@ The core functionality of this project is encapsulated within several key classe
 
 * **`Pipeline`**: Designed for the data transformation phase, the `Pipeline` class allows for the consecutive application of a series of functions to an input Pandas DataFrame. Once a `Pipeline` object is initialized with the desired sequence of transformation functions, it can be efficiently reused to process data through the defined steps. **Crucially, the `Pipeline` class currently enforces that all accepted functions must have a signature indicating a Pandas DataFrame as input and returning a Pandas DataFrame, a requirement that is also verified at runtime.**
 
+### Testing Strategy
+
+For quality assurance, a suite of unit tests has been developed to validate individual components and functions of the codebase. While these tests provide foundational coverage, the current test coverage stands at approximately 50%, indicating areas for future expansion.
+
 ## Design Choices and Approach
 
 ### Data Extraction Flow and Temporary Storage
@@ -105,10 +109,6 @@ Following the extraction phase, the stored JSON files are loaded into `pandas` D
 ### Data Load
 
 Finally, the processed `pandas` DataFrames for monetary and organization type information are stored as CSV files: `etl_money_result.csv` for the monetary data, and `etl_entity_result.csv` for the entity data.
-
-## Testing Strategy
-
-For quality assurance, a suite of unit tests has been developed to validate individual components and functions of the codebase. While these tests provide foundational coverage, the current test coverage stands at approximately 50%, indicating areas for future expansion.
 
 ## Installation
 
