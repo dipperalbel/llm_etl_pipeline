@@ -36,7 +36,9 @@ Within the `extraction`, `transformation`, and `typings` sub-folders, you will f
 
 Data validation is a cornerstone of this project's reliability. To enforce strict data integrity, we've heavily leveraged the `Pydantic` package.
 
-Every public method in the project is adorned with a call_validate decorator, ensuring that data conforms to predefined schemas at the point of invocation. Furthermore, most of the project's classes, such as Document and MonetaryInformation, were designed with immutability in mind. This means that once an object of these classes is initialized, its field values cannot be altered, preventing unintended data corruption. We've applied this rigorous validation and immutability to public interfaces, while private methods, which are internal to the class's operations, do not have these same constraints.
+Every public method in the project is adorned with a call_validate decorator, ensuring that data conforms to predefined schemas at the point of invocation. We've applied this rigorous validation and immutability to public interfaces, while private methods, which are internal to the class's operations, do not have these same constraints.
+
+Furthermore, most of the project's classes, such as Document and MonetaryInformation, were designed with immutability in mind. This means that once an object of these classes is initialized, its field values cannot be altered, preventing unintended data corruption.
 
 ## Design Choices and Approach
 
