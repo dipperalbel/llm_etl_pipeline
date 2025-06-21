@@ -82,7 +82,7 @@ The core of this solution for information extraction relies on a multi-stage pro
 
 The entire extraction process described above is repeated for **each individual call for proposal PDF document**. The extracted data from each PDF is then temporarily stored in two separate JSON files: one for monetary information and another for entity-related data.
 
-## NOTES
+#### NOTES
 
 * **Local LLM Models:** We utilized `phi4:14b` primarily for extracting monetary information and `gemma3:27b` for processing consortium-related table data.
 
