@@ -7,7 +7,7 @@ This project operates under the following key assumptions regarding the input PD
 * **English Language Content:** The textual content within all input PDFs is assumed to be primarily in the English language. Text processing and analysis steps (e.g., keyword extraction, natural language processing) may yield inaccurate or irrelevant results for content in other languages.
 * **Consistent Document Structure:** Particularly for **"call for proposals"** PDFs, a very similar internal structure and layout are assumed. The project's parsing logic relies on this consistency to accurately locate and extract specific pieces of information. Deviations in structure of the call for proposal PDFs may lead to incomplete or incorrect data extraction.
 * **Presence of Call Proposals:** For each EU project intended for processing, it's assumed that a corresponding 'call for proposal' PDF file exists within the designated input folder. This PDF must contain the string "call" in its filename.
-* **Handling of Numbered Call Files:** In cases where multiple PDF files exist for the same call, identified by a common naming pattern like `PROGRAMCODE-YYYY-TYPE-GRANT-CATEGORY-XX` (e.g., `AMIF-2025-TF2-AG-INTE-01`, `AMIF-2025-TF2-AG-INTE-02`), the project will only process the file with the *lowest numerical suffix* (XX). This is due to the assumption that such sequentially numbered files contains identical core information. For example, the call for proposal PDFs for AMIF-2025-TF2-AG-INTE-01-WOMEN, AMIF-2025-TF2-AG-INTE-02-HEALTH,... contains the same exact information.
+* **Handling of Numbered Call Files:** In cases where multiple PDF files exist for the same call, identified by a common naming pattern like `PROGRAMCODE-YYYY-TYPE-GRANT-CATEGORY-XX` (e.g., `AMIF-2025-TF2-AG-INTE-01`, `AMIF-2025-TF2-AG-INTE-02`), the project will only process the file with the *lowest numerical suffix* (XX). This is due to the assumption that such sequentially numbered files contains identical core information. For example, the call for proposal PDFs for `AMIF-2025-TF2-AG-INTE-01-WOMEN`, `AMIF-2025-TF2-AG-INTE-02-HEALTH`,... contain identical core information despite their differing specific extensions.
 * **Currency Denomination:** All monetary values (e.g., prices, budgets, grants) mentioned within the PDF documents are assumed to be denominated in **Euros (EUR)**.
 
 ## Solution Overview
@@ -29,6 +29,14 @@ The `llm_etl_pipeline` directory is organized into the following key sub-folders
 * **`extraction/`**: Contains the core methods and classes dedicated to the extraction of raw data from the PDF documents, including PDF conversion and text segmentation
 * **`transformation/`**: This directory contains the classes and functions responsible for transforming and validating the extracted data. This includes data cleaning and deduplication logic.
 * **`typings/`**: This folder is dedicated to custom Python type hints, which facilitate dynamic analysis checks across the project, particularly within the `extraction` and `transformation` packages.
+
+Within the `extraction`, `transformation`, and `typings` sub-folders, you will find additional sub-folders named `public` and `internal`. These indicate whether the methods and classes within are designed for public consumption or internal project use, respectively.
+
+## Data Validation with Pydantic
+
+Data validation is a cornerstone of this project's reliability. To enforce strict data integrity, we've heavily leveraged the `Pydantic` package.
+
+Every public method in the project is adorned with a call_validate decorator, ensuring that data conforms to predefined schemas at the point of invocation. Furthermore, most of the project's classes, such as Document and MonetaryInformation, were designed with immutability in mind. This means that once an object of these classes is initialized, its field values cannot be altered, preventing unintended data corruption. We've applied this rigorous validation and immutability to public interfaces, while private methods, which are internal to the class's operations, do not have these same constraints.
 
 ## Design Choices and Approach
 
