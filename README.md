@@ -32,7 +32,7 @@ The `llm_etl_pipeline` directory is organized into the following key sub-folders
 
 Within the `extraction`, `transformation`, and `typings` sub-folders, you will find additional sub-folders named `public` and `internal`. These indicate whether the methods and classes within are designed for public consumption or internal project use, respectively.
 
-# Data Validation with Pydantic
+### Data Validation with Pydantic
 
 Data validation is a cornerstone of this project's reliability. To enforce strict data integrity, we've heavily leveraged the `Pydantic` package.
 
@@ -41,7 +41,7 @@ Every public method in the project is adorned with a call_validate decorator, en
 Furthermore, most of the project's classes, such as Document and MonetaryInformation, were designed with immutability in mind. This means that once an object of these classes is initialized, its field values cannot be altered, preventing unintended data corruption.
 
 
-# Key Classes
+### Key Classes
 
 The core functionality of this project is encapsulated within several key classes, each designed for a specific stage of the data processing pipeline:
 
