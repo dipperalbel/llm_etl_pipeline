@@ -32,7 +32,7 @@ The `llm_etl_pipeline` directory is organized into the following key sub-folders
 
 Within the `extraction`, `transformation`, and `typings` sub-folders, you will find additional sub-folders named `public` and `internal`. These indicate whether the methods and classes within are designed for public consumption or internal project use, respectively.
 
-## Data Validation with Pydantic
+# Data Validation with Pydantic
 
 Data validation is a cornerstone of this project's reliability. To enforce strict data integrity, we've heavily leveraged the `Pydantic` package.
 
@@ -40,7 +40,22 @@ Every public method in the project is adorned with a call_validate decorator, en
 
 Furthermore, most of the project's classes, such as Document and MonetaryInformation, were designed with immutability in mind. This means that once an object of these classes is initialized, its field values cannot be altered, preventing unintended data corruption.
 
+
+# Key Classes
+
+The core functionality of this project is encapsulated within several key classes, each designed for a specific stage of the data processing pipeline:
+
+* **`PdfConverter`**: This class is responsible for the initial step of converting PDF files into a raw string format, making their content accessible for further processing.
+
+* **`Document`**: The `Document` class is central to text handling. Its primary purpose is to segment the raw text into logical paragraphs. Furthermore, it provides functionality to query these paragraphs using regular expressions, allowing for the extraction of sub-filtered text sections. A crucial design aspect of this class is its **immutability**: once a `Document` object is initialized, its field values cannot be altered, ensuring data integrity.
+
+* **`LocalLLM`**: This class facilitates interaction with a local Large Language Model (LLM). Its sole purpose is to perform queries against the local LLM, enabling the application of advanced natural language processing capabilities.
+
+* **`Pipeline`**: Designed for the data transformation phase, the `Pipeline` class allows for the consecutive application of a series of functions to an input Pandas DataFrame. Once a `Pipeline` object is initialized with the desired sequence of transformation functions, it can be efficiently reused to process data through the defined steps. **Crucially, the `Pipeline` class currently enforces that all accepted functions must have a signature indicating a Pandas DataFrame as input and returning a Pandas DataFrame, a requirement that is also verified at runtime.**
+
 ## Design Choices and Approach
+
+### Data Extraction Flow and Temporary Storage
 
 The core of this solution for information extraction relies on a multi-stage process leveraging local Large Language Models (LLMs) for specific data points. Our approach prioritizes accuracy and efficiency through a combination of heuristic text processing and targeted LLM inference.
 
@@ -48,42 +63,42 @@ The core of this solution for information extraction relies on a multi-stage pro
     The process begins with converting the PDF documents into raw text strings. This is handled by the `PdfConverter` class, which internally uses the `docling` package for robust text extraction from PDF files.
 
 * **Text Segmentation - Paragraphs:**
-    Following text conversion, the raw text is segmented into paragraphs using the `Document` class. While various methods for paragraph definition were explored, including `\n` (single newline), `\n\n` (empty line), and models like `SaT (wtpsplit)` (https://github.com/segment-any-text/wtpsplit), an heuristic approach based on empty lines (`\n\n`) was adopted for its superior performance in accurately identifying distinct paragraph ( this perfomance depends of course on how it is extracted the text from the PDFs).
+    Following text conversion, the raw text undergoes segmentation into paragraphs using the `Document` class. Although various methods for defining paragraphs were explored—including single newlines (`\n`), empty lines (`\n\n`), and advanced models like `SaT (wtpsplit)` (https://github.com/segment-any-text/wtpsplit)—an heuristic approach based on empty lines (`\n\n`) was ultimately adopted. This method demonstrated superior performance in accurately identifying distinct paragraphs, a performance that is, of course, dependent on the initial text extraction quality from the PDFs.
 
 * **Text Segmentation - Sentences:**
-    After paragraph definition, sentences are extracted from each paragraph. For this granular segmentation, the `SaT (wtpsplit)` model (https://github.com/segment-any-text/wtpsplit) was employed due to its effectiveness in delineating individual sentences.
+    After paragraph definition, sentences are extracted from each paragraph. For this granular segmentation, the set of `SaT (wtpsplit)` models (https://github.com/segment-any-text/wtpsplit) were employed due to their effectiveness in delineating individual sentences.
 
 * **Information Filtering with Regular Expressions:**
     Before LLM processing, the segmented text (primarily paragraphs, though sentence-level filtering is also an option) undergoes a crucial filtering step using Regular Expressions. These regex patterns were custom-designed based on common characteristics observed in "call for proposal" PDFs to pre-select relevant sections. This includes identifying:
     * **Monetary Amounts:** Strings containing currency indicators (e.g., "EUR") coupled with digits.
-    * **Consortium Details:** Sections typically related to consortium formation, specifically looking for the table that indicate minimum number of entities. 
+    * **Consortium Details:** Sections typically related to consortium formation, specifically looking for the table that indicate minimum number of entities.
 
 * **LLM-based Data Extraction:**
     Once filtered, the relevant paragraphs are fed to the pre-selected local LLMs.
     * **Granular Processing:** To maximize extraction accuracy, particularly for monetary information, paragraphs are inputted to the LLMs in batches rather than providing the entire document at once. This granular approach was observed to yield more precise results (at least for local LLM). For consortium entity extraction, the LLM receives the identified table as its input.
     * **Prompt Engineering:** User and system prompts for the LLMs are dynamically generated using a `Jinja2` template.
-    * **Structured Output:** The LLM's raw output is then parsed using a `PydanticJsonParser`. This ensures that the extracted data conforms to a predefined schema, enabling robust validation and easy integration into subsequent processes. However, there is not a well defined fallback method in case of ValidationError caused by the parser.
+    * **Structured Output:** The LLM's raw output is then parsed using a `PydanticJsonParser`. This ensures that the extracted data conforms to a predefined schema, enabling robust validation and easy integration into subsequent processes. However, it is important to note that a well-defined fallback method is currently not in place to handle `ValidationError` instances raised by the parser.
     * **Iterative Accumulation:** This batch processing, prompting, and parsing cycle is repeated for all filtered paragraphs, and the results are accumulated to form the complete extracted dataset for the document.
 
-* **Local LLM Models:** We utilized `phi4:14b` primarily for extracting monetary information and `gemma3:27b` for processing consortium-related table data.
- 
-### Data Extraction Flow and Temporary Storage
+The entire extraction process described above is repeated for **each individual call for proposal PDF document**. The extracted data from each PDF is then temporarily stored in two separate JSON files: one for monetary information and another for entity-related data.
 
-The entire extraction process described above is repeated for **each individual PDF document**. The extracted data from each PDF is then temporarily stored in two separate JSON files: one for monetary information and another for entity-related data.
+## NOTES
+
+* **Local LLM Models:** We utilized `phi4:14b` primarily for extracting monetary information and `gemma3:27b` for processing consortium-related table data.
 
 ### Data Transformation
 
-Following the extraction phase, the temporarily stored JSON files are loaded into `pandas` DataFrames for subsequent transformation and consolidation. This stage is crucial for refining the extracted raw data:
+Following the extraction phase, the stored JSON files are loaded into `pandas` DataFrames for subsequent transformation and consolidation. This stage is crucial for refining the extracted raw data:
 
 * **Monetary Data Transformation:**
     Extracted monetary data undergoes various validation checks to ensure its quality and adherence to expected conditions. We then filter and retain only the information most relevant for analysis, such as the grant requested per project, available call budgets, or specific budget allocations per topic as mentioned in the call for proposal.
     A significant challenge identified was the **duplication of monetary values**, where identical amounts might or might not refer to the same underlying entity or concept (e.g., two mentions of the minimum EU grant request). To address this, a specific deduplication strategy is employed:
-    1.  Sentences containing the duplicate monetary amounts are converted into embeddings using `Sentence-Transformers (S-BERT)`.
+    1.  Sentences containing the duplicate monetary amounts are converted into embeddings using `Sentence-Transformers (S-BERT)`(https://github.com/UKPLab/sentence-transformers).
     2.  Hierarchical clustering is then performed on these embeddings using cosine distance.
     3.  If multiple sentences fall within the same cluster (indicating high semantic similarity for the same amount), the sentence with the *longest text* is selected as the representative for that cluster, simplifying the data while retaining context.
 
 * **Entity Data Transformation:**
-    For the extracted entity data, due to time constraints, the transformation primarily involves basic validation checks followed by a simple stacking of the data extracted that contained the entity information.
+    For the extracted entity data, due to time constraints, the transformation primarily involves basic validation checks followed by a simple stacking of the type of organization data extracted.
 
 * **Pipeline Orchestration:** All these transformation steps are orchestrated via a `Pipeline` class, which applies a series of pre-written functions sequentially to the `pandas` DataFrames, streamlining the data processing workflow.
  
