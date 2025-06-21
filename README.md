@@ -3,21 +3,21 @@
 
 This project operates under the following key assumptions regarding the input PDF files and project structure:
 
-* **Textual PDFs:** All input PDF documents are assumed to be *text-searchable* (i.e., not scanned images). The project relies on the ability to extract raw text content directly from the PDFs. If scanned PDFs are provided, text extraction may fail or produce garbled output.
+* **Textual PDFs:** All input PDF documents are assumed to be *text-searchable* (i.e., not scanned images). The project relies on the ability to extract raw text content directly from the PDFs. If scanned PDFs are provided, text extraction will fail.
 * **English Language Content:** The textual content within all input PDFs is assumed to be primarily in the English language. Text processing and analysis steps (e.g., keyword extraction, natural language processing) may yield inaccurate or irrelevant results for content in other languages.
-* **Consistent Document Structure:** Particularly for "call for proposals" PDFs, a very similar internal structure and layout are assumed. The project's parsing logic relies on this consistency to accurately locate and extract specific pieces of information. Deviations in structure may lead to incomplete or incorrect data extraction.
-* **Presence of Call Proposals:** For each EU project intended for processing, it's assumed that a corresponding PDF file exists within the designated input folder. This PDF must contain the string "call" in its filename or a prominent location within its text to correctly identify and process it as a call proposal document.
-* **Handling of Numbered Call Files:** In cases where multiple PDF files exist for the same call, identified by a common naming pattern like `PROGRAMCODE-YYYY-TYPE-GRANT-CATEGORY-XX` (e.g., `AMIF-2025-TF2-AG-INTE-01`, `AMIF-2025-TF2-AG-INTE-02`), the project will only process the file with the *lowest numerical suffix* (XX). This is due to the assumption that such sequentially numbered files for the same call contain identical core information.
+* **Consistent Document Structure:** Particularly for **"call for proposals"** PDFs, a very similar internal structure and layout are assumed. The project's parsing logic relies on this consistency to accurately locate and extract specific pieces of information. Deviations in structure of the call for proposal PDFs may lead to incomplete or incorrect data extraction.
+* **Presence of Call Proposals:** For each EU project intended for processing, it's assumed that a corresponding 'call for proposal' PDF file exists within the designated input folder. This PDF must contain the string "call" in its filename.
+* **Handling of Numbered Call Files:** In cases where multiple PDF files exist for the same call, identified by a common naming pattern like `PROGRAMCODE-YYYY-TYPE-GRANT-CATEGORY-XX` (e.g., `AMIF-2025-TF2-AG-INTE-01`, `AMIF-2025-TF2-AG-INTE-02`), the project will only process the file with the *lowest numerical suffix* (XX). This is due to the assumption that such sequentially numbered files contains identical core information. For example, the call for proposal PDFs for AMIF-2025-TF2-AG-INTE-01-WOMEN, AMIF-2025-TF2-AG-INTE-02-HEALTH,... contains the same exact information.
 * **Currency Denomination:** All monetary values (e.g., prices, budgets, grants) mentioned within the PDF documents are assumed to be denominated in **Euros (EUR)**.
 
 ## Solution Overview
 
-This project focuses on extracting key information from EU project-related PDF documents. During the data extraction process, it was identified that the provided PDFs, AMIF grant projects, do not contain specific **Technology Readiness Level (TRL)** information. While TRL is a common concept in Horizon EU projects, the documents only offered generic definitions (TRL 1 to 9) without project-specific details. Attempts to extract TRL data, including leveraging LLM AI models (gemini), proved unsuccessful and led to hallucinations. For AMIF grant projects, it is not practice to indicate TLR.
+During the analysis of the AMIF grant project PDFs, it became clear that they do not contain project-specific **Technology Readiness Level (TRL)** information. While TRL is a standard concept in Horizon Europe projects, the documents only provided generic definitions (TRL 1 to 9) without practical application to the projects themselves. Our attempts to extract any TRL data, even using advanced LLM AI models like Gemini, were unsuccessful and often resulted in hallucinatory outputs. This outcome is consistent with our understanding from both internet research and Gemini, which suggests that TRL — a metric primarily focused on technological maturity — is not typically indicated in AMIF grant projects, given their social rather than technological nature.
 
-Consequently, the solution prioritizes the extraction of available and reliable data points:
+Consequently, the solution prioritizes the extraction of the following data points:
 
 * **Budget Information:** This includes detailed proposal budget and grant amounts per project, which are consistently and clearly documented within the **"call for proposal" PDFs**.
-* **Organization Details:** Extraction of the number and type of organizations involved in grants was also targeted. However, due to ambiguity and lack of clear definitions within the document describing the task regarding what "number and type of organization" specifically entails in the grant context, this aspect could not be fully implemented or clarified through further inquiry.
+* **Organization Details:** We also aimed to extract the number and type of organizations involved in the grants. However, this proved challenging due to the ambiguity and lack of clear definitions in the task documentation. Without a precise understanding of what "number and type of organization" specifically entails within the grant context, we couldn't fully implement this extraction or clarify it through further inquiry.
 
 Given that many of the provided PDFs were found to be templates or contained minimal additional data relevant to the extraction goals, the core focus of this solution was directed exclusively towards processing the "call for proposal" PDFs, as they proved to be the most valuable source of actionable information.
 
@@ -25,10 +25,10 @@ Given that many of the provided PDFs were found to be templates or contained min
 
 The `llm_etl_pipeline` directory is organized into the following key sub-folders, each serving a distinct purpose:
 
-* **`customized_loggers/`**: This Python package is responsible for setting up and managing a customized `loguru` logger, ensuring consistent and informative logging across the project.
+* **`customized_loggers/`**: This Python package is responsible for setting up and managing a customized `loguru` logger.  It outputs logs to the console and simultaneously stores them in the `/logs` directory at the project's root.
 * **`extraction/`**: Contains the core methods and classes dedicated to the extraction of raw data from the PDF documents, including PDF conversion and text segmentation
-* **`transformation/`**: Houses the classes and functions responsible for the transformation and validation of the data extracted by the extraction process, including data cleaning, and deduplication logic.
-* **`typings/`**: This folder contains custom type hints for Python enabling dynamic analysis checks throughout the project. They are used in extraction and transfromation packages.
+* **`transformation/`**: This directory contains the classes and functions responsible for transforming and validating the extracted data. This includes data cleaning and deduplication logic.
+* **`typings/`**: This folder is dedicated to custom Python type hints, which facilitate dynamic analysis checks across the project, particularly within the `extraction` and `transformation` packages.
 
 ## Design Choices and Approach
 
