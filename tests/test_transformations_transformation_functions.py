@@ -187,7 +187,6 @@ class TestDropRowsNotSatisfyingRegex:
 
         result_df = drop_rows_not_satisfying_regex(df, columns_to_check, regex_pattern)
         pd.testing.assert_frame_equal(result_df, expected_df)
-        print("Test 19: Passed - No rows dropped, all satisfied regex.")
 
     def test_drop_rows_not_satisfying_regex_multiple_columns_and_mixed_matches(self):
         """
@@ -257,9 +256,6 @@ class TestDropRowsNotSatisfyingRegex:
             df, columns_to_check, combined_regex_pattern
         )
         pd.testing.assert_frame_equal(result_df, expected_df)
-        print(
-            "Test 20: Passed - Multiple columns, mixed matches, correct rows dropped."
-        )
 
     def test_drop_rows_not_satisfying_regex_empty_dataframe_raises_validation_error(
         self,
@@ -289,7 +285,6 @@ class TestDropRowsNotSatisfyingRegex:
             "Column 'non_existent' not found in the DataFrame. Cannot check regex."
             in str(excinfo.value)
         )
-        print("Test 22: Passed - Non-existent column, ValueError raised.")
 
     def test_drop_rows_not_satisfying_regex_column_with_nulls_raises_value_error(self):
         """
@@ -304,7 +299,6 @@ class TestDropRowsNotSatisfyingRegex:
             "Column 'col1' contains 'None' or missing values at indices: [1]. All values must be non-null for regex check."
             in str(excinfo.value)
         )
-        print("Test 23: Passed - Column with nulls, ValueError raised.")
 
     def test_drop_rows_not_satisfying_regex_column_with_non_string_data_raises_value_error(
         self,
@@ -318,7 +312,6 @@ class TestDropRowsNotSatisfyingRegex:
         with pytest.raises(ValueError) as excinfo:
             drop_rows_not_satisfying_regex(df, columns_to_check, regex_pattern)
         assert "Column 'col1' contains non-string elements" in str(excinfo.value)
-        print("Test 24: Passed - Column with non-string data, ValueError raised.")
 
     def test_drop_rows_not_satisfying_regex_empty_columns_to_check_raises_validation_error(
         self,
@@ -345,7 +338,6 @@ class TestDropRowsNotSatisfyingRegex:
         with pytest.raises(ValidationError) as excinfo:
             drop_rows_not_satisfying_regex(df, columns_to_check, regex_pattern)
         assert "String should have at least 1 character" in str(excinfo.value)
-        print("Test 26: Passed - Empty regex pattern, ValidationError raised.")
 
 
 class TestCheckColumnsSatisfyRegex:
@@ -476,7 +468,6 @@ class TestCheckColumnsSatisfyRegex:
         with pytest.raises(ValidationError) as excinfo:
             check_columns_satisfy_regex(df, columns_to_check, regex_pattern)
         assert "String should have at least 1 character" in str(excinfo.value)
-        print("Test 17: Passed - Empty regex pattern, ValidationError raised.")
 
 
 class TestCheckStringColumns:

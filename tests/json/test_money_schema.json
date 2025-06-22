@@ -1,0 +1,86 @@
+[
+  {
+    "AMIF-2024-TF2-AG-INFO-01": {
+      "results": [
+        {
+          "value": 10000000.0,
+          "currency": "EUR",
+          "context": "available call budget",
+          "original_sentence": "The available call budget is EUR 10 000 000 ."
+        },
+        {
+          "value": 1250000.0,
+          "currency": "EUR",
+          "context": "minimum EU grant amount per project",
+          "original_sentence": "The requested EU contribution to the project 's budget (' maximum EU grant amount ' per project) must range between EUR 1 250 000 and EUR 2 500 000."
+        },
+        {
+          "value": 2500000.0,
+          "currency": "EUR",
+          "context": "maximum EU grant amount per project",
+          "original_sentence": "The requested EU contribution to the project 's budget (' maximum EU grant amount ' per project) must range between EUR 1 250 000 and EUR 2 500 000."
+        },
+        {
+          "value": 1250000.0,
+          "currency": "EUR",
+          "context": "minimum EU Grant amount per project (Requested EU contribution)",
+          "original_sentence": "Minimum (EUR) 1 250 000"
+        },
+        {
+          "value": 2500000.0,
+          "currency": "EUR",
+          "context": "maximum EU Grant amount per project (Requested EU contribution)",
+          "original_sentence": "Maximum (EUR) 2 500 000"
+        },
+        {
+          "value": 60000.0,
+          "currency": "EUR",
+          "context": "individual requested grant amount",
+          "original_sentence": "if the individual requested grant amount is not more than EUR 60 000."
+        }
+      ]
+    }
+  },
+  {
+    "AMIF-2024-TF2-AG-THB-01": {
+      "results": [
+        {
+          "value": 6000000.0,
+          "currency": "EUR",
+          "context": "available call budget",
+          "original_sentence": "The available call budget is EUR 6 000 000."
+        },
+        {
+          "value": 500000.0,
+          "currency": "EUR",
+          "context": "minimum grant amount",
+          "original_sentence": "The grant amount must range between minimum EUR 500 000 and maximum EUR1 000 000."
+        },
+        {
+          "value": 1000000.0,
+          "currency": "EUR",
+          "context": "maximum grant amount",
+          "original_sentence": "The grant amount must range between minimum EUR 500 000 and maximum EUR1 000 000."
+        },
+        {
+          "value": 500000.0,
+          "currency": "EUR",
+          "context": "minimum EU Grant amount per project",
+          "original_sentence": "Minimum (EUR) 500 000"
+        },
+        {
+          "value": 1000000.0,
+          "currency": "EUR",
+          "context": "maximum EU Grant amount per project",
+          "original_sentence": "Maximum (EUR) 1 000 000"
+        },
+        {
+          "value": 60000.0,
+          "currency": "EUR",
+          "context": "individual requested grant amount",
+          "original_sentence": "if the individual requested grant amount is not more than EUR 60 000."
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "AMIF-2024-TF2-AG-INFO-01": {
+      "results": [
+        [
+          {
+            "organization_type": "non-profit"
+          },
+          {
+            "organization_type": "international organisation"
+          },
+          {
+            "organization_type": "for-profit"
+          }
+        ],
+        {
+          "min_entities": [
+            3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "AMIF-2024-TF2-AG-THB-01": {
+      "results": [
+        [
+          {
+            "organization_type": "non-profit"
+          },
+          {
+            "organization_type": "international organisation"
+          },
+          {
+            "organization_type": "for-profit"
+          }
+        ],
+        {
+          "min_entities": [
+            3
+          ]
+        }
+      ]
+    }
+  }
+]
