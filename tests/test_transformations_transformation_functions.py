@@ -11,6 +11,9 @@ from llm_etl_pipeline.transformation import (
     group_by_document_and_stack_types,
     reduce_list_ints_to_unique,
     verify_list_column_contains_only_ints,
+    verify_no_empty_strings,
+    verify_no_missing_data,
+    verify_no_negatives,
 )
 from llm_etl_pipeline.typings import NonEmptyDataFrame
 
@@ -33,6 +36,152 @@ def sample_dataframe_general() -> NonEmptyDataFrame:
             "min_entities": [[1, 2, 1], [1, 2, 1], [3, 4, 3], [3, 4, 3], [5, 6]],
         }
     )
+
+
+@pytest.fixture
+def sample_non_empty() -> NonEmptyDataFrame:
+    return pd.DataFrame(
+        {
+            "id": [1, 2, 3, 4, 5],
+            "text_col": ["apple", "banana", "orange", "grape", "kiwi"],
+            "num_col": [10, 20, 30, 40, 50],
+            "list_col": [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]],
+            "document_id": ["doc1", "doc1", "doc2", "doc2", "doc3"],
+            "entity_type": ["PERSON", "ORG", "LOC", "PERSON", "ORG"],
+            "min_entities": [[1, 2, 1], [1, 2, 1], [3, 4, 3], [3, 4, 3], [5, 6]],
+        }
+    )
+
+
+class TestVerifyNoMissingData:
+    """
+    Test suite for the verify_no_missing_data function.
+    """
+
+    def test_no_missing_data_success(self, sample_non_empty):  # Use caplog fixture
+        """
+        Test that the function returns the DataFrame
+        """
+        # Reset caplog to ensure only logs from this test are captured
+        result_df = verify_no_missing_data(sample_non_empty)
+        pd.testing.assert_frame_equal(result_df, sample_non_empty)
+
+    def test_missing_none_raises_value_error(
+        self, sample_dataframe_general
+    ):  # Use caplog fixture
+        """
+        Test that a ValueError is raised when the DataFrame contains NaN values.
+        """
+        with pytest.raises(ValueError) as excinfo:
+            verify_no_missing_data(sample_dataframe_general)
+
+        # Check for error message containing the column with NaN
+        expected_error_message = "Found 'None' or missing values in column 'nullable_col' at indices: [1]. No missing data is allowed."
+        assert expected_error_message in str(excinfo.value)
+
+    def test_empty_df_as_input(self):  # Use caplog fixture
+        """
+        Test that a ValueError is raised when the input DataFrame is empty
+        """
+        with pytest.raises(ValueError) as excinfo:
+            verify_no_missing_data(pd.DataFrame())
+
+        # Check for error message containing the column with NaN
+        expected_error_message = "empty"
+        assert expected_error_message in str(excinfo.value)
+
+    def test_none_df_as_input(self):  # Use caplog fixture
+        """
+        Test that a ValueError is raised when the input is None
+        """
+        with pytest.raises(ValueError) as excinfo:
+            verify_no_missing_data(None)
+
+        # Check for error message containing the column with NaN
+        expected_error_message = "None"
+        assert expected_error_message in str(excinfo.value)
+
+
+class TestVerifyNoNegatives:
+    """
+    Test suite for the verify_no_negatives function.
+    These tests explicitly avoid logging assertions as requested.
+    """
+
+    def test_no_negatives_success(self, sample_non_empty):
+        """
+        Test that the function returns the DataFrame when no negative values are present.
+        """
+        result_df = verify_no_negatives(sample_non_empty)
+        pd.testing.assert_frame_equal(result_df, sample_non_empty)
+
+    def test_negatives_raises_value_error(self):
+        """
+        Test that a ValueError is raised when a numeric column contains negative values.
+        """
+        df = pd.DataFrame(
+            {
+                "col1": [1, -2, 3],  # Negative value here
+                "col2": [0.0, 1.5, 10.0],
+            }
+        )
+        with pytest.raises(ValueError) as excinfo:
+            verify_no_negatives(df)
+
+        expected_error_message = "negative values in numeric column 'col1' at indices: [1]. All numeric values must be non-negative."
+        assert expected_error_message in str(excinfo.value)
+
+    def test_negatives_in_float_column_raises_value_error(self):
+        """
+        Test that a ValueError is raised when a float column contains negative values.
+        """
+        df = pd.DataFrame(
+            {"col_a": [1.0, 2.0, -5.5], "col_b": ["x", "y", "z"]}  # Negative float here
+        )
+        with pytest.raises(ValueError) as excinfo:
+            verify_no_negatives(df)
+
+        expected_error_message = "negative values in numeric column 'col_a' at indices: [2]. All numeric values must be non-negative."
+        assert expected_error_message in str(excinfo.value)
+
+    def test_empty_dataframe_raises_validation_error_negatives(self):
+        """
+        Test that an empty DataFrame raises a ValidationError for verify_no_negatives due to NonEmptyDataFrame typing.
+        """
+        df = pd.DataFrame()
+        with pytest.raises(ValidationError) as excinfo:
+            verify_no_negatives(df)
+
+        assert "empty" in str(excinfo.value)
+
+    def test_dataframe_with_nan_but_no_negatives(self):
+        """
+        Test with a DataFrame containing NaNs but no negative values in numeric columns.
+        NaNs should be ignored for negative checks.
+        """
+        df = pd.DataFrame(
+            {
+                "col1": [1, float("nan"), 3],
+                "col2": [0.0, None, 10.0],  # None in object column, NaN in numeric
+                "col3": [4, 5, 6],
+            }
+        )
+        result_df = verify_no_negatives(df)
+        pd.testing.assert_frame_equal(result_df, df)
+
+    def test_non_numeric_columns_are_ignored(self):
+        """
+        Test that non-numeric columns with values that might look negative (e.g., strings)
+        do not trigger an error.
+        """
+        df = pd.DataFrame(
+            {
+                "text_col": ["positive", "negative_str", "100", "-50_string"],
+                "num_col": [1, 2, 3, 4],
+            }
+        )
+        result_df = verify_no_negatives(df)
+        pd.testing.assert_frame_equal(result_df, df)
 
 
 # --- Tests for drop_rows_if_no_column_matches_regex ---
