@@ -3,12 +3,6 @@ from typing import Any
 
 import pandas as pd
 
-# Assuming utils_documents and pydantic.InstanceOf are still needed elsewhere
-# in your project, even if not directly used in the provided functions.
-# If they are *not* used at all in the file, then they should be removed.
-# from pydantic import InstanceOf
-# from utils_documents import *
-
 
 def _validate_regex_syntax(regex: str) -> str:
     """
