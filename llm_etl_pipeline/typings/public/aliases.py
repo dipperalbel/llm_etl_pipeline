@@ -123,10 +123,11 @@ def _validate_sat_model_id_and_path(v: Any) -> Union[StandardSaTModelId, Path]:
     )
 
 
-# Use Annotated with the custom validator
-SaTModelId = Annotated[
-    Union[StandardSaTModelId, str, Path],  # Keep all original input types
-    AfterValidator(_validate_sat_model_id_and_path),  # Apply the custom validator last
+# Combined type for sat_model_id parameter
+SaTModelId = Union[
+    StandardSaTModelId,
+    str,  # Local path as a string
+    Path,  # Local path as a Path object
 ]
 """
 Represents a SaT (Semantic Augmentation Tool) model identifier, which can be:
