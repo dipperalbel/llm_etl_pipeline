@@ -12,12 +12,7 @@ from llm_etl_pipeline.transformation import (
     reduce_list_ints_to_unique,
     verify_list_column_contains_only_ints,
 )
-from llm_etl_pipeline.typings import (
-    NonEmptyDataFrame,
-    NonEmptyListStr,
-    NonEmptyStr,
-    RegexPattern,
-)
+from llm_etl_pipeline.typings import NonEmptyDataFrame
 
 
 # --- Tests for drop_rows_if_no_column_matches_regex ---
@@ -56,13 +51,6 @@ class TestDropRowsIfNoColumnMatchesRegex:
         regex = r"a"  # 'a' is present in all rows in colA or colB
 
         result_df = drop_rows_if_no_column_matches_regex(df, columns, regex)
-
-        # DEBUG PRINT: What is result_df actually? (Keeping for user's own debug if needed)
-        import builtins  # Use builtins.print to ensure it's not mocked by pytest's capture
-
-        builtins.print("\n--- DEBUG: result_df in test_keeps_all_matching_rows ---")
-        builtins.print(result_df)
-        builtins.print("--- END DEBUG ---\n")
 
         # Explicitly define expected_df to rule out any re-indexing issues
         expected_df = pd.DataFrame(

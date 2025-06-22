@@ -84,9 +84,6 @@ class Pipeline(BaseModel):
             signature = inspect.signature(func)
             parameters = list(signature.parameters.values())
             # DEBUG: Stampa i dettagli di ogni funzione controllata
-
-            print("PIPPO")
-
             if not parameters:
                 logger.error(
                     f"Function '{func_name}' must accept at least one argument."

@@ -36,5 +36,5 @@ todo_include_todos = True
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'furo' # Changed from 'alabaster'
+html_theme = "sphinx_rtd_theme" # Changed from 'alabaster'
 html_static_path = ['_static']
