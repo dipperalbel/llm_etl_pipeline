@@ -7,7 +7,12 @@ from pydantic import ValidationError  # For testing Pydantic validations
 
 # Import necessary functions and types
 from llm_etl_pipeline.transformation import (
+    check_columns_satisfy_regex,
+    check_numeric_columns,
+    check_string_columns,
     drop_rows_if_no_column_matches_regex,
+    drop_rows_not_satisfying_regex,
+    drop_rows_with_non_positive_values,
     group_by_document_and_stack_types,
     reduce_list_ints_to_unique,
     verify_list_column_contains_only_ints,
@@ -51,6 +56,675 @@ def sample_non_empty() -> NonEmptyDataFrame:
             "min_entities": [[1, 2, 1], [1, 2, 1], [3, 4, 3], [3, 4, 3], [5, 6]],
         }
     )
+
+
+class TestDropRowsWithNonPositiveValues:
+    """
+    Test suite for the 'drop_rows_with_non_positive_values' function.
+    """
+
+    def test_no_non_positive_values(self):
+        """
+        Test case to verify that no rows are dropped when the specified columns
+        contain only positive values.
+        """
+        input_df = NonEmptyDataFrame(
+            {"A": [1, 2, 3], "B": [10, 20, 30], "C": [100, 200, 300]}
+        )
+        columns_to_check = ["A", "B"]
+        expected_df = input_df.copy()
+        result_df = drop_rows_with_non_positive_values(input_df, columns_to_check)
+        pd.testing.assert_frame_equal(result_df, expected_df)
+
+    def test_single_non_positive_value(self):
+        """
+        Test case to ensure that a single row with a non-positive value (zero)
+        in a specified column is correctly dropped.
+        """
+        input_df = NonEmptyDataFrame(
+            {"A": [1, 0, 3], "B": [10, 20, 30], "C": [100, 200, 300]}
+        )
+        columns_to_check = ["A"]
+        expected_df = NonEmptyDataFrame(
+            {"A": [1, 3], "B": [10, 30], "C": [100, 300]}, index=[0, 2]
+        )
+        result_df = drop_rows_with_non_positive_values(input_df, columns_to_check)
+        pd.testing.assert_frame_equal(result_df, expected_df)
+
+    def test_multiple_non_positive_values_single_column(self):
+        """
+        Test case to check if multiple rows containing non-positive values
+        (negative and zero) in a single specified column are all dropped.
+        """
+        input_df = NonEmptyDataFrame({"A": [1, -5, 3, 0, 7], "B": [10, 20, 30, 40, 50]})
+        columns_to_check = ["A"]
+        expected_df = NonEmptyDataFrame(
+            {"A": [1, 3, 7], "B": [10, 30, 50]}, index=[0, 2, 4]
+        )
+        result_df = drop_rows_with_non_positive_values(input_df, columns_to_check)
+        pd.testing.assert_frame_equal(result_df, expected_df)
+
+    def test_column_not_found(self):
+        """
+        Test case to verify that a ValueError is raised when a specified column
+        in 'columns_to_check' does not exist in the DataFrame.
+        """
+        input_df = NonEmptyDataFrame({"A": [1, 2], "B": [3, 4]})
+        columns_to_check = ["C"]
+        with pytest.raises(ValueError, match="not found"):
+            drop_rows_with_non_positive_values(input_df, columns_to_check)
+
+    def test_column_with_null_values(self):
+        """
+        Test case to confirm that a ValueError is raised when a specified column
+        contains null (None or NaN) values.
+        """
+        input_df = NonEmptyDataFrame({"A": [1, None, 3], "B": [10, 20, 30]})
+        columns_to_check = ["A"]
+        with pytest.raises(ValueError, match="'None'"):
+            drop_rows_with_non_positive_values(input_df, columns_to_check)
+
+    def test_column_with_non_numeric_values(self):
+        """
+        Test case to ensure that a ValueError is raised when a specified column
+        contains non-numeric elements (e.g., strings) that cannot be checked for positivity.
+        """
+        input_df = NonEmptyDataFrame({"A": [1, "two", 3], "B": [10, 20, 30]})
+        columns_to_check = ["A"]
+        with pytest.raises(ValueError, match="non-numeric elements"):
+            drop_rows_with_non_positive_values(input_df, columns_to_check)
+
+    def test_dataframe_with_float_values(self):
+        """
+        Test case to verify the correct behavior when dealing with float values,
+        including negative floats and zero, ensuring corresponding rows are dropped.
+        """
+        input_df = NonEmptyDataFrame(
+            {"A": [1.5, -0.1, 3.0, 0.0, 7.2], "B": [10.1, 20.2, 30.3, 40.4, 50.5]}
+        )
+        columns_to_check = ["A"]
+        expected_df = NonEmptyDataFrame(
+            {"A": [1.5, 3.0, 7.2], "B": [10.1, 30.3, 50.5]}, index=[0, 2, 4]
+        )
+        result_df = drop_rows_with_non_positive_values(input_df, columns_to_check)
+        pd.testing.assert_frame_equal(result_df, expected_df)
+
+
+class TestDropRowsNotSatisfyingRegex:
+    """
+    Test suite for the drop_rows_not_satisfying_regex function.
+    """
+
+    def test_drop_rows_not_satisfying_regex_drops_rows(self):
+        """
+        Test that rows not satisfying the regex are correctly dropped.
+        """
+        df = pd.DataFrame(
+            {
+                "col_id": [1, 2, 3, 4],
+                "value": ["apple_123", "banana_xyz", "cherry_456", "date_abc"],
+            }
+        )
+        columns_to_check = ["value"]
+        regex_pattern = r"^\w+_(\d{3})$"  # Ends with _ and 3 digits
+        expected_df = pd.DataFrame(
+            {"col_id": [1, 3], "value": ["apple_123", "cherry_456"]}, index=[0, 2]
+        )  # Original indices maintained
+
+        result_df = drop_rows_not_satisfying_regex(df, columns_to_check, regex_pattern)
+        pd.testing.assert_frame_equal(result_df, expected_df)
+
+    def test_drop_rows_not_satisfying_regex_no_rows_dropped(self):
+        """
+        Test that no rows are dropped when all values satisfy the regex.
+        """
+        df = pd.DataFrame(
+            {"col_id": [1, 2, 3], "code": ["CODE_001", "CODE_002", "CODE_003"]}
+        )
+        columns_to_check = ["code"]
+        regex_pattern = r"^CODE_\d{3}$"
+        expected_df = df.copy()  # All rows should be kept
+
+        result_df = drop_rows_not_satisfying_regex(df, columns_to_check, regex_pattern)
+        pd.testing.assert_frame_equal(result_df, expected_df)
+        print("Test 19: Passed - No rows dropped, all satisfied regex.")
+
+    def test_drop_rows_not_satisfying_regex_multiple_columns_and_mixed_matches(self):
+        """
+        Test dropping rows based on multiple columns with mixed match results.
+        A row is dropped if *any* of the specified columns fail the regex.
+        """
+        df = pd.DataFrame(
+            {
+                "id": [10, 11, 12, 13, 14],
+                "email": [
+                    "a@b.com",
+                    "c@d.com",
+                    "e.f.g@h.net",
+                    "invalid-email",
+                    "valid@domain.org",
+                ],
+                "phone": [
+                    "123-456-7890",
+                    "abc-def-ghij",
+                    "987-654-3210",
+                    "111-222-3333",
+                    "555-555-5555",
+                ],
+            }
+        )
+        columns_to_check = ["email", "phone"]
+        email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        phone_regex = r"^\d{3}-\d{3}-\d{4}$"
+
+        combined_regex_pattern = f"({email_regex})|({phone_regex})"
+
+        expected_df = pd.DataFrame(
+            {
+                "id": [
+                    10,
+                    12,
+                    13,
+                    14,
+                ],  # Row 11 (index 1) 'abc-def-ghij' and 'c@d.com' (not matching phone/email)
+                # Row 13 (index 3) 'invalid-email'
+                "email": [
+                    "a@b.com",
+                    "e.f.g@h.net",
+                    "invalid-email",
+                    "valid@domain.org",
+                ],
+                "phone": [
+                    "123-456-7890",
+                    "987-654-3210",
+                    "111-222-3333",
+                    "555-555-5555",
+                ],
+            },
+            index=[0, 2, 3, 4],
+        )  # Row at index 1 is dropped because 'phone' fails.
+
+        expected_df = pd.DataFrame(
+            {
+                "id": [10, 12, 14],
+                "email": ["a@b.com", "e.f.g@h.net", "valid@domain.org"],
+                "phone": ["123-456-7890", "987-654-3210", "555-555-5555"],
+            },
+            index=[0, 2, 4],
+        )
+
+        result_df = drop_rows_not_satisfying_regex(
+            df, columns_to_check, combined_regex_pattern
+        )
+        pd.testing.assert_frame_equal(result_df, expected_df)
+        print(
+            "Test 20: Passed - Multiple columns, mixed matches, correct rows dropped."
+        )
+
+    def test_drop_rows_not_satisfying_regex_empty_dataframe_raises_validation_error(
+        self,
+    ):
+        """
+        Test that an empty DataFrame raises a ValidationError due to NonEmptyDataFrame typing.
+        """
+        df = pd.DataFrame()
+        columns_to_check = ["any_col"]
+        regex_pattern = r".*"
+        with pytest.raises(ValidationError) as excinfo:
+            drop_rows_not_satisfying_regex(df, columns_to_check, regex_pattern)
+        assert "empty" in str(excinfo.value)
+
+    def test_drop_rows_not_satisfying_regex_non_existent_column_raises_value_error(
+        self,
+    ):
+        """
+        Test that a ValueError is raised if a specified column does not exist.
+        """
+        df = pd.DataFrame({"col1": ["data"]})
+        columns_to_check = ["non_existent"]
+        regex_pattern = r".*"
+        with pytest.raises(ValueError) as excinfo:
+            drop_rows_not_satisfying_regex(df, columns_to_check, regex_pattern)
+        assert (
+            "Column 'non_existent' not found in the DataFrame. Cannot check regex."
+            in str(excinfo.value)
+        )
+        print("Test 22: Passed - Non-existent column, ValueError raised.")
+
+    def test_drop_rows_not_satisfying_regex_column_with_nulls_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a specified column contains null values.
+        """
+        df = pd.DataFrame({"col1": ["data1", None, "data3"]})
+        columns_to_check = ["col1"]
+        regex_pattern = r".*"
+        with pytest.raises(ValueError) as excinfo:
+            drop_rows_not_satisfying_regex(df, columns_to_check, regex_pattern)
+        assert (
+            "Column 'col1' contains 'None' or missing values at indices: [1]. All values must be non-null for regex check."
+            in str(excinfo.value)
+        )
+        print("Test 23: Passed - Column with nulls, ValueError raised.")
+
+    def test_drop_rows_not_satisfying_regex_column_with_non_string_data_raises_value_error(
+        self,
+    ):
+        """
+        Test that a ValueError is raised if a specified column contains non-string elements.
+        """
+        df = pd.DataFrame({"col1": ["str1", 123, "str3"]})
+        columns_to_check = ["col1"]
+        regex_pattern = r".*"
+        with pytest.raises(ValueError) as excinfo:
+            drop_rows_not_satisfying_regex(df, columns_to_check, regex_pattern)
+        assert "Column 'col1' contains non-string elements" in str(excinfo.value)
+        print("Test 24: Passed - Column with non-string data, ValueError raised.")
+
+    def test_drop_rows_not_satisfying_regex_empty_columns_to_check_raises_validation_error(
+        self,
+    ):
+        """
+        Test that an empty list for columns_to_check raises a ValidationError.
+        """
+        df = pd.DataFrame({"col1": ["a"]})
+        columns_to_check = []
+        regex_pattern = r".*"
+        with pytest.raises(ValidationError) as excinfo:
+            drop_rows_not_satisfying_regex(df, columns_to_check, regex_pattern)
+        assert "input_value=" in str(excinfo.value)
+
+    def test_drop_rows_not_satisfying_regex_empty_regex_pattern_raises_validation_error(
+        self,
+    ):
+        """
+        Test that an empty regex pattern string raises a ValidationError.
+        """
+        df = pd.DataFrame({"col1": ["a"]})
+        columns_to_check = ["col1"]
+        regex_pattern = ""
+        with pytest.raises(ValidationError) as excinfo:
+            drop_rows_not_satisfying_regex(df, columns_to_check, regex_pattern)
+        assert "String should have at least 1 character" in str(excinfo.value)
+        print("Test 26: Passed - Empty regex pattern, ValidationError raised.")
+
+
+class TestCheckColumnsSatisfyRegex:
+    """
+    Test suite for the check_columns_satisfy_regex function.
+    """
+
+    def test_check_columns_satisfy_regex_success(self):
+        """
+        Test that the function returns the DataFrame when all specified string columns
+        have values that fully satisfy the regex pattern.
+        """
+        df = pd.DataFrame(
+            {
+                "id": [1, 2],
+                "codes": ["ABC123", "XYZ789"],
+                "names": ["NameOne", "NameTwo"],
+                "mixed": ["ABC123", 456],  # This column should not be checked by regex
+            }
+        )
+        columns_to_check = ["codes", "names"]
+        # Regex for alphanumeric codes, and names starting with Name
+        regex_pattern = r"^[A-Z]{3}\d{3}$|^Name[A-Za-z]+$"
+        result_df = check_columns_satisfy_regex(df, columns_to_check, regex_pattern)
+        pd.testing.assert_frame_equal(result_df, df)
+
+    def test_check_columns_satisfy_regex_column_not_found_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a specified column is not in the DataFrame.
+        """
+        df = pd.DataFrame({"colA": ["val1"]})
+        columns_to_check = ["non_existent_col"]
+        regex_pattern = r".*"
+        with pytest.raises(ValueError) as excinfo:
+            check_columns_satisfy_regex(df, columns_to_check, regex_pattern)
+        assert "not found in the DataFrame. Cannot check regex." in str(excinfo.value)
+
+    def test_check_columns_satisfy_regex_empty_column_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a specified column contains None.
+        """
+        df = pd.DataFrame(
+            {
+                "col1": ["a", "b"],
+                "empty_col": [None, None],  # Effectively empty
+            }
+        )
+        columns_to_check = ["empty_col"]
+        regex_pattern = r".*"
+        with pytest.raises(ValueError) as excinfo:
+            check_columns_satisfy_regex(df, columns_to_check, regex_pattern)
+        assert "'None'" in str(excinfo.value)
+
+    def test_check_columns_satisfy_regex_null_values_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a specified column contains null values.
+        """
+        df = pd.DataFrame(
+            {
+                "data_col": ["item1", None, "item3"],  # Contains None
+            }
+        )
+        columns_to_check = ["data_col"]
+        regex_pattern = r".*"
+        with pytest.raises(ValueError) as excinfo:
+            check_columns_satisfy_regex(df, columns_to_check, regex_pattern)
+        assert "'None'" in str(excinfo.value)
+
+    def test_check_columns_satisfy_regex_non_string_data_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a column contains non-string data.
+        """
+        df = pd.DataFrame(
+            {
+                "mixed_col": ["text", 123, "more_text"],  # Contains an integer
+            }
+        )
+        columns_to_check = ["mixed_col"]
+        regex_pattern = r".*"
+        with pytest.raises(ValueError) as excinfo:
+            check_columns_satisfy_regex(df, columns_to_check, regex_pattern)
+        assert "contains non-string elements" in str(excinfo.value)
+
+    def test_check_columns_satisfy_regex_no_match_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a string value does not fully satisfy the regex.
+        """
+        df = pd.DataFrame(
+            {
+                "product_codes": ["P123", "A-456", "P789"],  # 'A-456' does not match
+            }
+        )
+        columns_to_check = ["product_codes"]
+        regex_pattern = r"^P\d{3}$"  # Starts with P, followed by 3 digits
+        with pytest.raises(ValueError) as excinfo:
+            check_columns_satisfy_regex(df, columns_to_check, regex_pattern)
+        assert "does NOT fully satisfy the regex" in str(excinfo.value)
+
+    def test_empty_dataframe_for_regex_check_raises_validation_error(self):
+        """
+        Test that an empty DataFrame raises a ValidationError due to NonEmptyDataFrame typing.
+        """
+        df = pd.DataFrame()
+        columns_to_check = ["any_col"]
+        regex_pattern = r".*"
+        with pytest.raises(ValidationError) as excinfo:
+            check_columns_satisfy_regex(df, columns_to_check, regex_pattern)
+        assert "empty" in str(excinfo.value)
+
+    def test_empty_columns_to_check_raises_validation_error_regex(self):
+        """
+        Test that an empty list for columns_to_check raises a ValidationError.
+        """
+        df = pd.DataFrame({"col1": ["a"]})
+        columns_to_check = []  # Empty list
+        regex_pattern = r".*"
+        with pytest.raises(ValidationError) as excinfo:
+            check_columns_satisfy_regex(df, columns_to_check, regex_pattern)
+        assert "input_value=[]" in str(excinfo.value)
+
+    def test_empty_regex_pattern_raises_validation_error(self):
+        """
+        Test that an empty regex pattern string raises a ValidationError due to NonEmptyStr.
+        """
+        df = pd.DataFrame({"col1": ["a"]})
+        columns_to_check = ["col1"]
+        regex_pattern = ""  # Empty string
+        with pytest.raises(ValidationError) as excinfo:
+            check_columns_satisfy_regex(df, columns_to_check, regex_pattern)
+        assert "String should have at least 1 character" in str(excinfo.value)
+        print("Test 17: Passed - Empty regex pattern, ValidationError raised.")
+
+
+class TestCheckStringColumns:
+    """
+    Test suite for the check_string_columns function.
+    """
+
+    def test_check_string_columns_success(self):
+        """
+        Test that the function returns the DataFrame when specified columns contain only strings and no nulls.
+        """
+        df = pd.DataFrame(
+            {
+                "id": [1, 2, 3],
+                "name": ["Alice", "Bob", "Charlie"],
+                "description": ["Info 1", "Info 2", "Info 3"],
+                "value": [10.5, 20.0, 30.1],
+            }
+        )
+        columns_to_check = ["name", "description"]
+        result_df = check_string_columns(df, columns_to_check)
+        pd.testing.assert_frame_equal(result_df, df)
+
+    def test_check_string_columns_column_not_found_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a specified column is not in the DataFrame.
+        """
+        df = pd.DataFrame({"colA": ["val1"], "colB": ["val2"]})
+        columns_to_check = ["colA", "non_existent_col"]
+        with pytest.raises(ValueError) as excinfo:
+            check_string_columns(df, columns_to_check)
+        assert "not found" in str(excinfo.value)
+
+    def test_check_string_columns_empty_column_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a specified string column is empty (contains only nulls).
+        """
+        df = pd.DataFrame(
+            {
+                "col1": ["a", "b"],
+                "empty_str_col": [None, None],  # Effectively empty for string check
+                "col3": ["x", "y"],
+            }
+        )
+        columns_to_check = ["empty_str_col"]
+        with pytest.raises(ValueError) as excinfo:
+            check_string_columns(df, columns_to_check)
+        assert "empty" in str(excinfo.value)
+
+    def test_check_string_columns_null_values_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a string column contains null values.
+        """
+        df = pd.DataFrame(
+            {
+                "col1": ["str1", "str2", None],  # Contains None
+                "col2": ["strA", "strB", "strC"],
+            }
+        )
+        columns_to_check = ["col1"]
+        with pytest.raises(ValueError) as excinfo:
+            check_string_columns(df, columns_to_check)
+        assert "'None'" in str(excinfo.value)
+
+    def test_check_string_columns_non_string_data_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a column contains non-string data (e.g., numbers, booleans).
+        """
+        df = pd.DataFrame(
+            {
+                "str_col": ["text", "more_text", "more_and_more_text"],
+                "mixed_type_col": ["item1", 123, "item3"],  # Contains an integer
+                "another_str_col": ["last", "first", "middle"],
+            }
+        )
+        columns_to_check = ["mixed_type_col"]
+        with pytest.raises(ValueError) as excinfo:
+            check_string_columns(df, columns_to_check)
+        assert "contains non-string elements" in str(excinfo.value)
+
+    def test_empty_dataframe_for_string_check_raises_validation_error(self):
+        """
+        Test that an empty DataFrame raises a ValidationError due to NonEmptyDataFrame typing.
+        """
+        df = pd.DataFrame()
+        columns_to_check = ["any_col"]
+        with pytest.raises(ValidationError) as excinfo:
+            check_string_columns(df, columns_to_check)
+        assert "empty" in str(excinfo.value)
+
+    def test_empty_columns_to_check_raises_validation_error(self):
+        """
+        Test that an empty list for columns_to_check raises a ValidationError.
+        """
+        df = pd.DataFrame({"col1": ["a", "b"]})
+        columns_to_check = []  # Empty list
+        with pytest.raises(ValidationError) as excinfo:
+            check_string_columns(df, columns_to_check)
+        assert "input_value=[]" in str(excinfo.value)
+
+
+class TestCheckNumericColumns:
+    """
+    Test suite for the check_numeric_columns function.
+    These tests explicitly avoid logging assertions.
+    """
+
+    def test_check_numeric_columns_success(self, sample_non_empty):
+        """
+        Test that the function returns the DataFrame when specified columns are numeric and valid.
+        """
+        columns_to_check = ["id", "num_col"]
+        result_df = check_numeric_columns(sample_non_empty, columns_to_check)
+        pd.testing.assert_frame_equal(result_df, sample_non_empty)
+
+    def test_check_numeric_columns_column_not_found_raises_value_error(
+        self, sample_non_empty
+    ):
+        """
+        Test that a ValueError is raised if a specified column is not in the DataFrame.
+        """
+
+        columns_to_check = ["id", "non_existent_col"]
+        with pytest.raises(ValueError) as excinfo:
+            check_numeric_columns(sample_non_empty, columns_to_check)
+        assert "not found" in str(excinfo.value)
+
+    def test_check_numeric_columns_empty_column_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a specified column is empty.
+        (e.g., if a column contains only NaNs, which effectively makes it empty for numeric content)
+        """
+        df = pd.DataFrame(
+            {
+                "col1": [1, 2, 3],
+                "empty_col": [
+                    float("nan"),
+                    float("nan"),
+                    float("nan"),
+                ],  # Effectively empty
+                "col3": [4, 5, 6],
+            }
+        )
+        columns_to_check = ["empty_col"]
+        with pytest.raises(ValueError) as excinfo:
+            check_numeric_columns(df, columns_to_check)
+        assert "None" in str(excinfo.value)
+
+    def test_check_numeric_columns_null_values_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a numeric column contains null values.
+        """
+        df = pd.DataFrame(
+            {"col1": [1, 2, None], "col2": [3.0, 4.0, 5.0]}  # Contains None
+        )
+        columns_to_check = ["col1"]
+        with pytest.raises(ValueError) as excinfo:
+            check_numeric_columns(df, columns_to_check)
+        assert "'None' or missing values" in str(excinfo.value)
+
+    def test_check_numeric_columns_non_numeric_data_raises_value_error(self):
+        """
+        Test that a ValueError is raised if a column contains non-numeric data.
+        """
+        df = pd.DataFrame(
+            {
+                "col1": [1, 2, 3],
+                "mixed_col": [10, "abc", 20],  # Non-numeric string
+                "col3": [30, 40, 50],
+            }
+        )
+        columns_to_check = ["mixed_col"]
+        with pytest.raises(ValueError) as excinfo:
+            check_numeric_columns(df, columns_to_check)
+        assert "contains non-numeric" in str(excinfo.value)
+
+    def test_empty_dataframe_for_numeric_check_raises_validation_error(self):
+        """
+        Test that an empty DataFrame raises a ValidationError for check_numeric_columns.
+        """
+        df = pd.DataFrame()
+        columns_to_check = ["any_col"]
+        with pytest.raises(ValidationError) as excinfo:
+            check_numeric_columns(df, columns_to_check)
+        assert "empty" in str(excinfo.value)
+
+    def test_empty_columns_to_check_raises_validation_error(self):
+        """
+        Test that an empty list for columns_to_check raises a ValidationError.
+        """
+        df = pd.DataFrame({"col1": [1, 2]})
+        columns_to_check = []  # Empty list
+        with pytest.raises(ValidationError) as excinfo:
+            check_numeric_columns(df, columns_to_check)
+        assert "input_value=[]" in str(excinfo.value)
+
+
+class TestVerifyNoEmptyStrings:
+    """
+    Test suite for the verify_no_empty_strings function.
+    """
+
+    def test_no_empty_strings_success(self, sample_non_empty):
+        """
+        Test that the function returns the DataFrame when no empty strings are present.
+        """
+        result_df = verify_no_empty_strings(sample_non_empty)
+        pd.testing.assert_frame_equal(result_df, sample_non_empty)
+
+    def test_empty_string_raises_value_error(self):
+        """
+        Test that a ValueError is raised when an object column contains an empty string.
+        """
+        df = pd.DataFrame(
+            {
+                "col1": ["value1", "", "value3"],  # Empty string here
+                "col2": [10, 20, 30],
+            }
+        )
+        with pytest.raises(ValueError) as excinfo:
+            verify_no_empty_strings(df)
+
+        expected_error_message = (
+            "empty strings ('') at indices: [1]. Empty strings are not allowed."
+        )
+        assert expected_error_message in str(excinfo.value)
+
+    def test_empty_dataframe_raises_validation_error_empty_strings(self):
+        """
+        Test that an empty DataFrame raises a ValidationError for verify_no_empty_strings
+        due to NonEmptyDataFrame typing.
+        """
+        df = pd.DataFrame()
+        with pytest.raises(ValidationError) as excinfo:
+            verify_no_empty_strings(df)
+
+        assert "empty" in str(excinfo.value)
+
+    def test_none_dataframe_raises_validation_error_empty_strings(self):
+        """
+        Test that an empty DataFrame raises a ValidationError for verify_no_empty_strings
+        due to NonEmptyDataFrame typing.
+        """
+        df = None
+        with pytest.raises(ValidationError) as excinfo:
+            verify_no_empty_strings(df)
+
+        assert "None" in str(excinfo.value)
 
 
 class TestVerifyNoMissingData:
