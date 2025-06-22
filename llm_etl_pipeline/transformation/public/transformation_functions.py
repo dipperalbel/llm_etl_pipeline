@@ -795,7 +795,6 @@ def drop_rows_if_no_column_matches_regex(
 
             if compiled_regex.search(cell_value):
                 keep_this_row = True
-                # print(f"KEEPING: Row Index {index} because column '{col}' with value '{cell_value}' satisfied regex '{regex_pattern}'.") # Uncomment for verbose output
                 break
 
         if keep_this_row:

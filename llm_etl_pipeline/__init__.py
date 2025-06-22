@@ -11,8 +11,6 @@ from llm_etl_pipeline.extraction import (
     Sentence,
     get_filtered_fully_general_series_call_pdfs,
     get_series_titles_from_paths,
-    print_document_results_entity,
-    print_document_results_money,
 )
 from llm_etl_pipeline.transformation import (
     Pipeline,
@@ -55,8 +53,6 @@ __all__ = [
     "ConsortiumParticipant",
     "get_filtered_fully_general_series_call_pdfs",
     "get_series_titles_from_paths",
-    "print_document_results_money",
-    "print_document_results_entity",
     "Pipeline",
     "remove_semantic_duplicates",
     "verify_no_missing_data",

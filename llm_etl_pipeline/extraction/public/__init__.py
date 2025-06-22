@@ -14,8 +14,6 @@ from llm_etl_pipeline.extraction.public.sentences import Sentence
 from llm_etl_pipeline.extraction.public.utils import (
     get_filtered_fully_general_series_call_pdfs,
     get_series_titles_from_paths,
-    print_document_results_entity,
-    print_document_results_money,
 )
 
 __all__ = [
@@ -30,6 +28,4 @@ __all__ = [
     "ConsortiumParticipant",
     "get_filtered_fully_general_series_call_pdfs",
     "get_series_titles_from_paths",
-    "print_document_results_money",
-    "print_document_results_entity",
 ]

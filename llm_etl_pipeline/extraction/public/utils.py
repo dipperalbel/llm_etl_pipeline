@@ -151,39 +151,3 @@ def get_series_titles_from_paths(pdf_paths: list[Path]) -> dict[Path, str]:
         f"Finished title extraction. Extracted titles for {len(titles)} files."
     )
     return titles
-
-
-# Function to pretty-print document results
-def print_document_results_money(doc_name, results):
-    print(f"\nResults from {doc_name}:")
-    # print(f"Amounts: {[(a.value, a.currency,a.context,a.original_sentence) for a in results['amounts']]}")
-    print(results)
-
-    for i, item in enumerate(results["results"]):
-        print(f"  Importo {i+1}:")
-        value = getattr(item, "value", item.get("value"))
-        currency = getattr(item, "currency", item.get("currency"))
-        context = getattr(item, "context", item.get("context"))
-        original_sentence = getattr(
-            item, "original_sentence", item.get("original_sentence")
-        )
-        print(f"    value: {value}")
-        print(f"    currency: {currency}")
-        print(f"    context: {context}")
-        print(f"    original_sentence: {original_sentence}")
-
-
-# Function to pretty-print document results
-def print_document_results_entity(doc_name, results):
-    print(f"\nResults from {doc_name}:")
-    # print(f"Amounts: {[(a.value, a.currency,a.context,a.original_sentence) for a in results['amounts']]}")
-    print(results)
-
-    for i, item in enumerate(results["results"]):
-        print(f"  Importo {i+1}:")
-        organization_type = getattr(item, "value", item.get("organization_type"))
-        original_sentence = getattr(item, "currency", item.get("original_sentence"))
-        context = getattr(item, "context", item.get("context"))
-        print(f"    organization_type: {organization_type}")
-        print(f"    original_sentence: {original_sentence}")
-        print(f"    context: {context}")
