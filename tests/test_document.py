@@ -157,7 +157,6 @@ class TestParagraph:
         assert "The attribute `sentences` cannot be changed once populated." in str(
             excinfo.value
         )
-        print(f"Test 4: Confirmed sentences reassignment restriction: {excinfo.value}")
 
     def test_paragraph_creation_empty_raw_text_raises_validation_error(self):
         """
@@ -166,7 +165,6 @@ class TestParagraph:
         with pytest.raises(ValidationError) as excinfo:
             Paragraph(raw_text="")
         assert "String should have at least 1 character" in str(excinfo.value)
-        print(f"Test 6: Confirmed ValidationError for empty raw_text: {excinfo.value}")
 
     def test_paragraph_validation_sentences_not_in_raw_text(self):
         """
@@ -181,7 +179,6 @@ class TestParagraph:
         with pytest.raises(ValueError) as excinfo:
             Paragraph(raw_text=paragraph_text, sentences=[s1, s2])
         assert "Not all sentences were matched in paragraph text." in str(excinfo.value)
-        print(f"Test 7: Confirmed ValueError for unmatched sentences: {excinfo.value}")
 
     def test_paragraph_validation_sentences_partially_in_raw_text(self):
         """
@@ -195,9 +192,6 @@ class TestParagraph:
         with pytest.raises(ValueError) as excinfo:
             Paragraph(raw_text=paragraph_text, sentences=[s1])
         assert "Not all sentences were matched in paragraph text." in str(excinfo.value)
-        print(
-            f"Test 8: Confirmed ValueError for partially matched sentence: {excinfo.value}"
-        )
 
     def test_paragraph_validation_sentences_exact_match(self):
         """
@@ -220,7 +214,6 @@ class TestParagraph:
         s1 = Sentence(raw_text=text)
         paragraph = Paragraph(raw_text=text, sentences=[s1])
         assert text in str(paragraph)
-        print(f"Test 10: Confirmed string representation: '{str(paragraph)}'")
 
     def test_paragraph_sentences_list_clearing_not_allowed_if_populated(self):
         """
