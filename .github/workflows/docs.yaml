@@ -22,20 +22,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup Python
         id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      
+
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
           virtualenvs-create: true
           virtualenvs-in-project: true
           installer-parallel: true
-  
+
       - name: Load cached pip wheels
         id: cached-pip-wheels
         uses: actions/cache@v4
@@ -45,23 +45,24 @@ jobs:
             ~/Library/Caches/pip
             ~\AppData\Local\pip\Cache
           key: pip-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-      
+
       - name: Install dependencies
-        run: poetry install --no-interaction --with dev --no-root
-      
+        # Removed --with dev as the user does not use a dev folder/dependency group
+        run: poetry install --no-interaction 
+
       - name: Build documentation
         run: |
           cd docs
           poetry run sphinx-build -b html source _build/html -v -E
-      
+
       - name: Create .nojekyll file
         run: touch docs/_build/html/.nojekyll
-      
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./docs/_build/html
-  
+
   deploy:
     environment:
       name: github-pages
@@ -72,4 +73,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4 
+        uses: actions/deploy-pages@v4
