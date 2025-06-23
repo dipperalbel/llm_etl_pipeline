@@ -2,7 +2,7 @@
 
 # Documentation
 
-You can check the documentation here: 
+You can check the documentation here: dipperalbel.github.io/llm_etl_pipeline/
 
 ## Assumptions
 
