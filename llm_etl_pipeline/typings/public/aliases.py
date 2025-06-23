@@ -1,6 +1,17 @@
-import sys
+"""
+This module defines a comprehensive set of custom type aliases using Pydantic's
+`Annotated` types and `Literal` for robust data validation and clear type hinting
+across the LLM ETL pipeline.
+
+These aliases enforce specific constraints such as non-emptiness for strings
+and DataFrames, positive integer values, valid regex syntax, and predefined
+literal choices for categories like reference depth, extraction types, and
+SaT model identifiers. They serve to enhance type safety and improve code
+readability throughout the project.
+"""
+
 from pathlib import Path
-from typing import Annotated, Any, Literal, TypeVar, Union
+from typing import Annotated, Literal, Union
 
 import pandas as pd
 from pydantic import (
@@ -13,19 +24,11 @@ from pydantic import (
     StringConstraints,
 )
 
-# Assuming these are custom validators defined elsewhere and are correctly imported.
-# If they are not used, they should be removed.
 from llm_etl_pipeline.typings.internal.validators import (
     _ensure_dataframe_type,
     _validate_non_empty_dataframe,
     _validate_regex_syntax,
 )
-
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    Self = TypeVar("Self")
-
 
 # --- Type Definitions ---
 

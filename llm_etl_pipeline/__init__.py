@@ -1,3 +1,5 @@
+"""Public API for subpackages of llm_etl_pipeline."""
+
 from llm_etl_pipeline.customized_logger import logger
 from llm_etl_pipeline.extraction import (
     ConsortiumComposition,
@@ -49,7 +51,8 @@ __all__ = [
     "LocalLLM",
     "PdfConverter",
     "MonetaryInformation",
-    "MonetaryInformationList" "ConsortiumComposition",
+    "MonetaryInformationList",
+    "ConsortiumComposition",
     "ConsortiumParticipant",
     "get_filtered_fully_general_series_call_pdfs",
     "get_series_titles_from_paths",
@@ -78,4 +81,5 @@ __all__ = [
     "LanguageRequirement",
     "ExtractionType",
     "logger",
+    "NonZeroInt",
 ]

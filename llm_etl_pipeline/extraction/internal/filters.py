@@ -1,7 +1,14 @@
+"""
+This module provides custom logging filters for the llm_etl_pipeline project.
+
+Specifically, it defines filters to suppress certain warning messages from being logged,
+enhancing log clarity by focusing on more relevant information.
+"""
+
 import logging
 
 
-class _SpecificWarningFilter(logging.Filter):
+class _SpecificWarningFilter(logging.Filter):  # pylint: disable=R0903
     """
     A custom logging filter to suppress specific warning messages.
 

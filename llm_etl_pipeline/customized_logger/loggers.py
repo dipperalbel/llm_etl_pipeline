@@ -1,13 +1,20 @@
+"""
+Provides a centralized and customizable logging solution for the project using Loguru.
+
+This module sets up a robust logging system that can be configured via environment
+variables, directing log messages to both standard output (console) and a file.
+It supports dynamic log level control and provides custom color schemes for better readability.
+"""
+
 import os
 import sys
-from pathlib import Path
 
 from loguru import logger
 
 # --- 1. Definire la directory dei log ---
-log_directory = "logs"
-log_file_name = "file_log.log"
-log_file_path = os.path.join(log_directory, log_file_name)
+LOG_DIRECTORY = "logs"
+LOG_FILE_NAME = "file_log.log"
+log_file_path = os.path.join(LOG_DIRECTORY, LOG_FILE_NAME)
 
 DEFAULT_LOGGER_LEVEL = "INFO"
 # Dynamically control logging state with env vars
@@ -19,16 +26,38 @@ class _DedicatedStream:
     """
     A dedicated stream wrapper for formatting and directing messages to
     a base stream.
+    This class intercepts messages and adds a consistent prefix before
+    writing them to an underlying stream, typically standard output or a file.
     """
 
     def __init__(self, base):
+        """
+        Initializes the dedicated stream wrapper.
+
+        Args:
+            base: The underlying stream object (e.g., sys.stdout, an open file object)
+                  to which formatted messages will be written.
+        """
         self.base = base
 
     def write(self, message):
+        """
+        Writes a formatted message to the base stream.
+
+        The message will be prefixed with "[project] " before being written.
+
+        Args:
+            message (str): The string message to be written.
+        """
         # You can add a prefix or other formatting if you wish
         self.base.write(f"[project] {message}")
 
     def flush(self):
+        """
+        Flushes the base stream's buffer.
+
+        Ensures that all buffered output is immediately written to the base stream.
+        """
         self.base.flush()
 
 

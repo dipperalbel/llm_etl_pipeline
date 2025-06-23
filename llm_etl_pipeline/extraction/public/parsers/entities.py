@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 from llm_etl_pipeline.typings import NonEmptyStr, NonZeroInt
 

@@ -1,3 +1,13 @@
+"""
+This module provides utility functions for filtering and extracting information
+from PDF file paths, specifically tailored for documents following a
+'PROGRAMCODE-YYYY-TYPE-GRANT-CATEGORY-XX' naming convention.
+
+It includes functionality to select specific PDF files based on complex
+filtering rules related to this series pattern and to extract the series
+title from matching file names.
+"""
+
 import os
 import re
 from pathlib import Path
@@ -75,14 +85,17 @@ def get_filtered_fully_general_series_call_pdfs(
                         )
                     except ValueError:
                         logger.warning(
-                            f"Could not convert '{extracted_number_str}' to int from file: {file_name}. Treating as 'other' call PDF."
+                            f"Could not convert '{extracted_number_str}' to int "
+                            f"from file: {file_name}. "
+                            "Treating as 'other' call PDF."
                         )
                         other_call_pdfs.append(file_path)
                 else:
                     other_call_pdfs.append(file_path)
-    except Exception as e:
+    except (PermissionError, OSError) as e:
         logger.error(
-            f"An error occurred while listing directory contents or processing files: {e}"
+            "An operating system error occurred while listing directory contents "
+            f"or processing files in '{path}': {e}"
         )
         return []
 
@@ -125,9 +138,7 @@ def get_series_titles_from_paths(pdf_paths: list[Path]) -> dict[Path, str]:
     """
     logger.info(f"Attempting to extract series titles from {len(pdf_paths)} PDF paths.")
     titles = {}
-    # Re-use the same generalized pattern to extract the title
     # Note: This pattern must match the *exact* segment you want as the title.
-    # Group 0 of a match returns the entire matched string.
     general_series_pattern = re.compile(
         r"([A-Z0-9]+)-\d{4}-([A-Z0-9]+)-([A-Z0-9]+)-([A-Z]+)-(\d{2})", re.IGNORECASE
     )
@@ -140,13 +151,9 @@ def get_series_titles_from_paths(pdf_paths: list[Path]) -> dict[Path, str]:
             titles[pdf_path] = match.group(0)
         else:
             logger.warning(
-                f"File '{file_name}' does not match the general series pattern. No specific title extracted."
+                f"File '{file_name}' does not match the general series pattern. "
+                "No specific title extracted."
             )
-
-        # else:
-        # If a path from the input list doesn't match the series pattern (e.g., it's an 'other_call_pdf'),
-        # it won't have this specific title extracted. You could add logic here
-        # to assign a default or indicate it's not applicable if needed.
     logger.success(
         f"Finished title extraction. Extracted titles for {len(titles)} files."
     )

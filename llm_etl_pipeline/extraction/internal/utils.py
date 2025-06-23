@@ -1,3 +1,18 @@
+"""
+This module provides a collection of utility functions for handling text,
+Jinja2 templates, and Sentence-Transformer (SaT) models within an LLM ETL pipeline.
+
+Key functionalities include:
+- Loading and validating Jinja2 and plain text templates from predefined paths.
+- Ensuring structural integrity of Jinja2 prompt templates, including bracket balancing
+  and newline control.
+- Cleaning raw text for optimal LLM input by normalizing whitespace and removing
+  problematic characters.
+- Segmenting text into paragraphs using different strategies.
+- Loading and caching SaT models for semantic text processing.
+- A fallback function `_when_all_is_lost` for error handling in a chain.
+"""
+
 from __future__ import annotations
 
 import re
@@ -24,23 +39,25 @@ def _get_template(
     """
     Retrieves and optionally processes a template from a predefined file path.
 
-    The function constructs the template's file path based on `template_type`,
-    reads its content, and then either compiles it into a Jinja2 `Template` object
-    (for ".j2" files) or returns it as a plain string (for ".txt" files).
-    It includes validation steps for ".j2" templates to ensure structural integrity.
+    The function constructs the template's file path based on `template_type`.
+    It then reads its content. The content is either compiled into a Jinja2
+    `Template` object (for ".j2" files) or returned as a plain string
+    (for ".txt" files). It includes validation steps for ".j2" templates to
+    ensure structural integrity.
 
     Args:
         template_name (str): The base name of the template file (e.g., "my_template").
                              Do not include the file extension.
-        template_type (Literal["prompt", "system"], optional): Specifies the subdirectory
-            from which to load the template.
+        template_type (Literal["prompt", "system"], optional): Specifies the
+            subdirectory from which to load the template.
             - "prompt": Loads from the "template/prompts" subdirectory.
             - "system": Loads from the "template/system" subdirectory.
             Defaults to "prompt".
-        template_extension (Literal["j2", "txt"], optional): The file extension of the template,
-            determining its format and how it's processed.
-            - "j2": The file is treated as a Jinja2 template and compiled using `_setup_jinja2_template`.
-                    Requires balanced brackets and no excessive newlines.
+        template_extension (Literal["j2", "txt"], optional): The file extension
+            of the template. This determines its format and how it's processed.
+            - "j2": The file is treated as a Jinja2 template and compiled
+                    using `_setup_jinja2_template`. It requires balanced brackets
+                    and no excessive newlines.
             - "txt": The file content is returned as a raw string.
             Defaults to "j2".
 
@@ -54,8 +71,10 @@ def _get_template(
             - If an unsupported `template_type` is provided.
             - If an unsupported `template_extension` is provided.
         AssertionError:
-            - If a ".j2" template's brackets are not balanced (`_are_prompt_template_brackets_balanced` fails).
-            - If a ".j2" template contains too many consecutive newlines (more than two).
+            - If a ".j2" template's brackets are not balanced
+              (`_are_prompt_template_brackets_balanced` fails).
+            - If a ".j2" template contains too many consecutive newlines
+              (more than two).
             - If the read template text is empty.
     """
 
@@ -155,8 +174,9 @@ def _setup_jinja2_template(template_text: str) -> Template:
        ensuring it's a dynamic template.
     2. Instantiates the `Template` object, applying options to trim and lstrip blocks
        for cleaner output.
-    3. Sets up essential global functions, such as `enumerate` and `_clean_text_for_llm_prompt`,
-       making them directly available for use within the template.
+    3. Sets up essential global functions, such as `enumerate` and
+       `_clean_text_for_llm_prompt`, making them directly available for use
+       within the template.
 
     Args:
         template_text (str): The raw text content of the template. This string
@@ -232,7 +252,8 @@ def _setup_jinja2_template(template_text: str) -> Template:
 
     Raises:
         ValueError: If the `template_text` does not contain any recognizable
-                    Jinja2 tags (e.g., `{{ variable }}`, `{% block %}`, `{# comment #}`).
+                    Jinja2 tags (e.g., `{{ variable }}`,
+                    `{% block %}`, `{# comment #}`).
     """
 
     if not _contains_jinja2_tags(template_text):
@@ -308,21 +329,23 @@ def _split_text_into_paragraphs(
     raw_text: str, paragraph_segmentation_mode: str
 ) -> list[str]:
     """
-    Splits a given raw text into a list of paragraphs based on the specified segmentation mode.
+    Splits a given raw text into a list of paragraphs.
+    The segmentation is based on the specified mode.
 
-    Empty paragraphs (after stripping whitespace) are filtered out from the result.
+    Empty paragraphs (after stripping whitespace) are filtered from the result.
 
     Args:
         raw_text (str): The input raw text string to be segmented.
-        paragraph_segmentation_mode (str): The strategy to use for splitting the text.
+        paragraph_segmentation_mode (str): The strategy for splitting the text.
             Accepted values are:
-            - "newlines": Splits the text by any occurrence of one or more newline characters
-                          (e.g., '\n', '\r', '\r\n').
-            - "empty_line": Splits the text by two or more consecutive newline characters,
-                            effectively treating empty lines as paragraph separators.
+            - "newlines": Splits the text by one or more newline characters
+                          (e.g., '\\n', '\\r', '\\r\\n').
+            - "empty_line": Splits the text by two or more consecutive newline
+                            characters. This effectively treats empty lines as
+                            paragraph separators.
 
     Returns:
-        list[str]: A list of non-empty strings, where each string represents a paragraph.
+        list[str]: A list of non-empty strings. Each string represents a paragraph.
 
     Raises:
         ValueError: If `paragraph_segmentation_mode` is not "newlines" or "empty_line".
@@ -358,7 +381,8 @@ def _get_sat_model(model_id: SaTModelId = "sat-3l-sm") -> SaT:
         model_id (SaTModelId):
             The identifier for the SaT model to be loaded. Defaults to "sat-3l-sm".
             This can be:
-            - A string corresponding to a predefined standard SaT model ID (e.g., "sat-3l-sm").
+            - A string corresponding to a predefined standard
+              SaT model ID (e.g., "sat-3l-sm").
             - A string or Path object pointing to a local directory containing a custom
               SaT model.
 
@@ -392,7 +416,8 @@ def _get_sat_model(model_id: SaTModelId = "sat-3l-sm") -> SaT:
         # Validate that the path exists and is a directory
         if not path.exists() or not path.is_dir():
             raise ValueError(
-                f"The provided SaT model path '{model_id}' does not exist or is not a directory."
+                f"The provided SaT model path '{model_id}' does not exist "
+                "or is not a directory."
             )
 
         is_local_path = True
@@ -405,15 +430,13 @@ def _get_sat_model(model_id: SaTModelId = "sat-3l-sm") -> SaT:
         if is_local_path:
             # If it's a local path that exists but isn't a valid SaT model
             raise RuntimeError(
-                f"The directory at '{model_id}' exists but does not contain a valid SaT model. "
+                f"The directory at '{model_id}' exists "
+                "but does not contain a valid SaT model. "
                 f"Error: {str(e)}"
             ) from e
-        else:
-            # For standard model IDs or other errors (e.g., download failed, invalid ID)
-            # This covers cases where SaT(model_id) fails for non-local paths.
-            raise RuntimeError(
-                f"Failed to load SaT model '{model_id}'. Error: {str(e)}"
-            ) from e
+        raise RuntimeError(
+            f"Failed to load SaT model '{model_id}'. Error: {str(e)}"
+        ) from e
 
 
 def _when_all_is_lost(inputs: Any) -> Any:

@@ -1,5 +1,13 @@
+"""
+This module defines the `Pipeline` class, which enables the creation and
+execution of data processing workflows for pandas DataFrames.
+
+The `Pipeline` class facilitates applying a sequence of transformation
+functions to data, ensuring type consistency and providing robust runtime
+validation throughout the process.
+"""
+
 import inspect
-from functools import partial
 from typing import Any, Callable, List
 
 import pandas as pd
@@ -40,6 +48,7 @@ class Pipeline(BaseModel):
     )
 
     @field_validator("functions")
+    # pylint: disable=no-self-argument
     def _check_function_signature(
         cls, v: List[Callable[[NonEmptyDataFrame, Any], NonEmptyDataFrame]]
     ) -> List[Callable[[NonEmptyDataFrame, Any], NonEmptyDataFrame]]:
@@ -100,7 +109,7 @@ class Pipeline(BaseModel):
             annotation = parameters[0].annotation
             if annotation is pd.DataFrame or annotation is NonEmptyDataFrame:
                 check_for_annotations = True
-            if not (check_for_annotations):
+            if not check_for_annotations:
                 logger.error(
                     f"Function '{func_name}': The first argument must be type-annotated as 'pd.DataFrame' or 'NonEmptyDataFrame'."
                 )
@@ -145,9 +154,7 @@ class Pipeline(BaseModel):
                 result_df = func(df)
 
                 # *** RUNTIME ACTUAL RETURN TYPE VERIFICATION ***
-                if not isinstance(
-                    result_df, pd.DataFrame
-                ):  # Changed 'df' to 'result_df' based on actual flow
+                if not isinstance(result_df, pd.DataFrame):
 
                     logger.error(
                         f"Function '{func_name}' at step {i+1} returned type "
@@ -158,7 +165,7 @@ class Pipeline(BaseModel):
                         f"'{type(result_df).__name__}', but expected 'DataFrame'."
                     )
 
-                df = result_df.copy()  # Pass the result to the next function
+                df = result_df.copy()
 
                 if df.empty:
                     logger.warning(
@@ -166,11 +173,10 @@ class Pipeline(BaseModel):
                     )
                     break
 
-            except Exception as e:
+            except Exception:
                 logger.error(
                     f"Error during execution of function '{func_name}' at step {i+1}"
                 )
-                # You might want to re-raise the exception or handle it specifically
                 raise
 
         logger.success("Pipeline execution complete.")

@@ -1,3 +1,13 @@
+"""
+This module defines the `Paragraph` Pydantic model, which represents
+a fundamental textual segment within a document.
+
+It is designed to hold the raw text content of a paragraph and an ordered
+collection of `Sentence` objects. The `Paragraph` model enforces immutability
+for its `raw_text` and prevents reassignment of its `sentences` list once populated,
+ensuring data integrity for text segmentation and analysis.
+"""
+
 from __future__ import annotations
 
 import sys

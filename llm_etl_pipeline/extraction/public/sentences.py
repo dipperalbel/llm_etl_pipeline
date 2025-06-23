@@ -1,3 +1,13 @@
+"""
+This module defines the `Sentence` Pydantic model, designed to represent
+an individual sentence as an immutable text unit.
+
+It serves as a foundational building block for structured document analysis,
+ensuring the consistency and integrity of textual content throughout the
+ETL pipeline. `Sentence` instances are typically generated automatically
+by higher-level segmentation processes within the `Document` and `Paragraph` classes.
+"""
+
 from __future__ import annotations
 
 from pydantic import BaseModel, Field

@@ -1,3 +1,14 @@
+"""
+This module defines the `Document` Pydantic model, which serves as a structured
+representation of a text document within the LLM ETL pipeline.
+
+The `Document` class facilitates the segmentation of raw text into hierarchical
+paragraphs and sentences using various strategies, including semantic segmentation
+via SaT (Sentence-as-Transformer) models. It also provides methods for
+accessing and filtering document content based on specific criteria like
+regular expressions and structural depth.
+"""
+
 import itertools
 import re
 from typing import Any, Literal, Optional
@@ -102,6 +113,7 @@ class Document(BaseModel):
         """
         return list(itertools.chain.from_iterable(i.sentences for i in self.paragraphs))
 
+    # pylint: disable=arguments-differ
     def model_post_init(self, __context: Any) -> None:
         """
         Pydantic hook that runs after model initialization and validation.
@@ -186,10 +198,7 @@ class Document(BaseModel):
             logger.info(
                 "Text is being split into paragraphs, as no custom paragraphs were provided..."
             )
-            if (
-                self.paragraph_segmentation_mode == "newlines"
-                or self.paragraph_segmentation_mode == "empty_line"
-            ):
+            if self.paragraph_segmentation_mode in ("newlines", "empty_line"):
                 paragraphs: list[str] = _split_text_into_paragraphs(
                     self.raw_text, self.paragraph_segmentation_mode
                 )
@@ -264,4 +273,4 @@ class Document(BaseModel):
                             )  # inherit custom data and additional context from paragraph object
                             for i in sent_group
                         ]
-        logger.success(f"Generated paragraphs form the raw text.")
+        logger.success("Generated paragraphs form the raw text.")

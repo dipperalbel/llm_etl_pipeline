@@ -90,6 +90,7 @@ pytest-recording = "^0.13.4"
 furo = "^2024.8.6"
 bandit = "^1.8.5"
 pylint = "^3.3.7"
+autodoc-pydantic = "^2.2.0"
 
 [tool.black]
 line-length = 88
@@ -109,3 +110,6 @@ name = "cz_conventional_commits"
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pylint.format]
+max-line-length = "88"

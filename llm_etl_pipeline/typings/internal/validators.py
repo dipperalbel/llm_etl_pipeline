@@ -1,3 +1,13 @@
+"""
+This module provides Pydantic-compatible validation utility functions for
+common data types and structures, particularly for use with regular expressions
+and pandas DataFrames.
+
+Functions include syntax validation for regex patterns, and checks for
+DataFrame types (ensuring non-None and non-empty DataFrames). These utilities
+are designed to be integrated into Pydantic models for robust data validation.
+"""
+
 import re
 from typing import Any
 
@@ -23,7 +33,7 @@ def _validate_regex_syntax(regex: str) -> str:
         re.compile(regex)
     except re.error as e:
         # If compilation fails, raise a ValueError with a clear message
-        raise ValueError(f"Invalid regular expression syntax: {e}")
+        raise ValueError(f"Invalid regular expression syntax: {e}") from e
     return regex
 
 

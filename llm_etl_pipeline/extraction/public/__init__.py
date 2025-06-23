@@ -1,3 +1,12 @@
+"""
+This module aggregates and exposes essential classes and functions for:
+- Representing structured document components (Document, Paragraph, Sentence).
+- Interacting with local Large Language Models (LocalLLM).
+- Handling PDF document conversions (PdfConverter).
+- Parsing specific information types (MonetaryInformation, ConsortiumComposition).
+- Providing utility functions for document series management.
+"""
+
 from llm_etl_pipeline.extraction.public.converters import PdfConverter
 from llm_etl_pipeline.extraction.public.documents import Document
 from llm_etl_pipeline.extraction.public.localllms import LocalLLM

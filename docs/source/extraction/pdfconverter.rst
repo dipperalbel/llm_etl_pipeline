@@ -6,8 +6,7 @@ PdfConverter
 A specialized class for the conversion of PDF documents, leveraging Pydantic
 for configuration options management and internally encapsulating a ``DocumentConverter`` instance.
 This class provides a streamlined interface for converting PDF documents
-into text, with configurable options for OCR, table structure detection,
-and cell matching during the conversion process.
+into text.
 
 **Example Usage:**
 
@@ -33,4 +32,3 @@ API Reference
    :no-undoc-members:
    :no-private-members:
    :no-special-members:
-

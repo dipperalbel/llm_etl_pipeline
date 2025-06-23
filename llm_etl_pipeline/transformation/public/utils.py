@@ -1,3 +1,14 @@
+"""
+This module provides a utility function to load and process JSON data
+into a pandas DataFrame.
+
+The `load_df_from_json` function is designed to handle various JSON structures,
+specifically those containing document-like data with 'results' fields that
+can be in different formats (list of dicts, list of lists, or list containing
+dicts and 'min_entities' information). It consolidates this data into a
+single DataFrame, adding 'document_id' and optionally 'min_entities' columns.
+"""
+
 import json
 
 import pandas as pd
@@ -43,7 +54,7 @@ def load_df_from_json(json_path: str) -> pd.DataFrame:
     """
     logger.info(f"Attempting to load data from JSON file: {json_path}")
     try:
-        with open(json_path, "r") as f:
+        with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
         logger.info(f"Successfully loaded JSON data from {json_path}.")
     except FileNotFoundError:

@@ -1,3 +1,13 @@
+"""
+This module defines the `LocalLLM` class, which extends LangChain's `ChatOllama`
+to provide a specialized interface for performing structured data extraction
+using locally hosted Large Language Models.
+
+It integrates Pydantic for output parsing, manages system and human prompts
+through templating, and orchestrates the batch processing of text input
+for efficient and robust information retrieval.
+"""
+
 import math
 from typing import Any, Optional
 
@@ -118,7 +128,7 @@ class LocalLLM(ChatOllama):
             template_type="system",
             template_extension="j2",
         ).render({"output_language": "en"})
-        logger.success(f"Default system prompt initialized using the template.")
+        logger.success("Default system prompt initialized using the template.")
 
     def _generate_human_prompt_from_template(
         self,
@@ -150,7 +160,9 @@ class LocalLLM(ChatOllama):
             {"extraction_type": extraction_type, "reference_depth": reference_depth}
         )
         logger.success(
-            f"Human prompt generated with extraction_type='{extraction_type}' and reference_depth='{reference_depth}'"
+            f"Human prompt generated "
+            f"with extraction_type='{extraction_type}' "
+            f"and reference_depth='{reference_depth}'"
         )
         return human_prompt
 
@@ -265,7 +277,8 @@ class LocalLLM(ChatOllama):
 
         results = {"results": list_of_json_objects}
         logger.success(
-            f"Text analysis completed. Total extracted items: {len(list_of_json_objects)}"
+            f"Text analysis completed. "
+            f"Total extracted items: {len(list_of_json_objects)}"
         )
         return results
 
@@ -300,7 +313,10 @@ class LocalLLM(ChatOllama):
                                              aggregated extraction results.
         """
         logger.info(
-            f"Starting result extraction with {len(list_elem)} elements, extraction_type='{extraction_type}', reference_depth='{reference_depth}', max_items_per_call={max_items_to_analyze_per_call}"
+            f"Starting result extraction with {len(list_elem)} elements, "
+            f"extraction_type='{extraction_type}', "
+            f"reference_depth='{reference_depth}', "
+            f"max_items_per_call={max_items_to_analyze_per_call}"
         )
         self._set_parser(extraction_type)
         human_prompt = self._generate_human_prompt_from_template(

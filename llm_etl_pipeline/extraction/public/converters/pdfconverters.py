@@ -1,3 +1,13 @@
+"""
+This module defines the `PdfConverter` Pydantic model, providing a robust
+interface for converting PDF documents to text.
+
+It encapsulates the `docling` library's `DocumentConverter` to offer
+configurable options for OCR, table structure detection, and cell matching
+during the conversion process. This class ensures consistent PDF processing
+within the LLM ETL pipeline, with integrated logging for clarity and error handling.
+"""
+
 import logging
 from pathlib import Path
 from typing import Any, Union
@@ -5,7 +15,7 @@ from typing import Any, Union
 from docling.datamodel.base_models import DocumentStream, InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, Field, PrivateAttr, validate_call
 
 from llm_etl_pipeline.customized_logger import logger
 from llm_etl_pipeline.extraction.internal import _SpecificWarningFilter
@@ -13,10 +23,10 @@ from llm_etl_pipeline.extraction.internal import _SpecificWarningFilter
 # Get the logger instance that Docling is using
 # This is used to ignore a specific warning message from docling.
 docling_specific_logger = logging.getLogger("docling_core.types.doc.document")
-specific_message_to_ignore = (
+SPECIFIC_MESSAGE_TO_IGNORE = (
     "Parameter `strict_text` has been deprecated and will be ignored."
 )
-my_filter = _SpecificWarningFilter(specific_message_to_ignore)
+my_filter = _SpecificWarningFilter(SPECIFIC_MESSAGE_TO_IGNORE)
 docling_specific_logger.addFilter(my_filter)
 
 
@@ -108,6 +118,7 @@ class PdfConverter(BaseModel):
             }
         )
 
+    @validate_call
     def convert_to_text(self, input_pdf_path: Union[Path, str, DocumentStream]) -> str:
         """
         Converts a PDF document to plain text using the internal `DocumentConverter` instance.

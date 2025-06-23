@@ -1,5 +1,13 @@
-from llm_etl_pipeline.transformation.public.pipelines import Pipeline
-from llm_etl_pipeline.transformation.public.transformation_functions import (
+"""
+This package provides the public API for the LLM ETL pipeline's transformation phase.
+
+It exposes the `Pipeline` class for orchestrating data transformations,
+a comprehensive set of `transformation_functions` for data cleaning, validation,
+and restructuring (e.g., semantic deduplication, data type checks, regex-based
+filtering, and grouping operations).
+"""
+
+from llm_etl_pipeline.transformation.public.functions import (
     check_columns_satisfy_regex,
     check_numeric_columns,
     check_string_columns,
@@ -14,6 +22,7 @@ from llm_etl_pipeline.transformation.public.transformation_functions import (
     verify_no_missing_data,
     verify_no_negatives,
 )
+from llm_etl_pipeline.transformation.public.pipelines import Pipeline
 from llm_etl_pipeline.transformation.public.utils import load_df_from_json
 
 __all__ = [
