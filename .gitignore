@@ -30,6 +30,8 @@ money_result.json
 build/
 dist/
 
+docs/build
+
 
 # Jupyter Notebook specific
 .ipynb_checkpoints/
