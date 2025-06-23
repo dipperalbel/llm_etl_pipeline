@@ -1,4 +1,9 @@
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dipperalbel/adfcd8d043e30baf54876431640c2936/raw/coverage.json)](https://github.com/dipperalbel/llm_etl_pipeline/actions)
+
+# Documentation
+
+You can check the documentation here: 
+
 ## Assumptions
 
 This project operates under the following key assumptions regarding the input PDF files and project structure:
