@@ -46,3 +46,21 @@ repos:
         pass_filenames: false
         always_run: true
         stages: [pre-commit]
+      
+        # Bandit security check for llm_etl_pipeline
+      - id: bandit-llm_etl_pipeline
+        name: Bandit security check (llm_etl_pipeline)
+        entry: poetry run bandit -r llm_etl_pipeline
+        pass_filenames: false
+        language: system
+        files: '\.py$'
+        stages: [pre-commit]
+      
+      # Bandit security check for tests and dev (skip B101 - assert usage)
+      - id: bandit-tests-dev
+        name: Bandit security check (tests/dev)
+        entry: poetry run bandit -r tests dev --skip B101
+        pass_filenames: false
+        language: system
+        files: '\.py$'
+        stages: [pre-commit]
