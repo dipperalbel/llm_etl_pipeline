@@ -63,7 +63,6 @@ if __name__ == "__main__":
         if selected_pdfs:        
             # Now, extract the specific title string for each of these PDFs
             extracted_titles = get_series_titles_from_paths(selected_pdfs)
-
         else:
             logger.error(f"No PDF files matching the criteria found in '{input_doc_path}'.")
             raise ValueError(f"No PDF files matching the criteria found in '{input_doc_path}'.")

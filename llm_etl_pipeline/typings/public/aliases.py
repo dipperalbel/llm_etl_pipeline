@@ -92,37 +92,6 @@ These typically refer to pre-trained models with varying complexities (e.g., num
 """
 
 
-# --- TO DO: MOVE THIS FUNCITON TO INTERNAL. I CANNOT DUE IT NOW DUE CIRCULAR DEPENDENCY ---
-def _validate_sat_model_id_and_path(v: Any) -> Union[StandardSaTModelId, Path]:
-    """
-    Validates SaT model ID: must be a standard ID or an existing file path.
-    """
-    if isinstance(v, Path):
-        # If it's already a Path object, ensure it exists
-        if not v.exists():  # <--- NEW CHECK
-            raise ValueError(f"Model path '{v}' does not exist.")
-        return v
-
-    if isinstance(v, str):
-        # Check if it's a standard ID first
-        if v in StandardSaTModelId.__args__:  # Access literal values from Literal type
-            return v
-
-        # If not a standard ID, treat it as a path string and check existence
-        path_obj = Path(v)
-        if not path_obj.exists():  # <--- NEW CHECK
-            # For the test, we want "invalid-model" to fail here,
-            # so it must not exist.
-            raise ValueError(
-                f"Model path '{v}' does not exist or is not a valid standard ID."
-            )
-        return path_obj
-
-    raise TypeError(
-        f"Invalid type for SaTModelId: {type(v).__name__}. Expected string or Path."
-    )
-
-
 # Combined type for sat_model_id parameter
 SaTModelId = Union[
     StandardSaTModelId,

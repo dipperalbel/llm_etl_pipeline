@@ -32,12 +32,6 @@ class Pipeline(BaseModel):
             Functions can optionally accept additional `Any` arguments, but
             at least one DataFrame-typed argument is required.
             Defaults to an empty list.
-
-    Configuration:
-        model_config (ConfigDict):
-            Pydantic configuration dictionary. `validate_assignment=True` ensures
-            that validations, including custom validators like `_check_function_signature`,
-            are re-run when attributes are assigned after initialization.
     """
 
     model_config = ConfigDict(validate_assignment=True)

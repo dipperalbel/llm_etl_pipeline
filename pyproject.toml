@@ -29,6 +29,8 @@ dependencies = [
     "duckduckgo-search (>=8.0.4,<9.0.0)",
     "langchain-google-community (>=2.0.7,<3.0.0)",
     "sphinx-rtd-theme (>=3.0.2,<4.0.0)",
+    "numpydoc (>=1.8.0,<2.0.0)",
+    "matplotlib (>=3.10.3,<4.0.0)",
 ]
 license = {text = "Apache-2.0"}
 keywords = [
