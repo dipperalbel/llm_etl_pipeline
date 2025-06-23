@@ -254,9 +254,10 @@ class Document(BaseModel):
                         # Filter out empty sents, if any
                         sent_group = [i.strip() for i in sent_group]
                         sent_group = [i for i in sent_group if len(i)]
-                        assert all(
-                            i in paragraph.raw_text for i in sent_group
-                        ), "Not all segmented sentences were matched in paragraph text."
+                        if not all(i in paragraph.raw_text for i in sent_group):
+                            raise ValueError(
+                                "Not all segmented sentences were matched in paragraph text."
+                            )
                         paragraph.sentences = [
                             Sentence(
                                 raw_text=i

@@ -47,7 +47,6 @@ jobs:
           key: pip-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies
-        # Removed --with dev as the user does not use a dev folder/dependency group
         run: poetry install --no-interaction 
 
       - name: Build documentation

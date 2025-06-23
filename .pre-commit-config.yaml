@@ -36,16 +36,6 @@ repos:
         pass_filenames: false
         language: system
         stages: [pre-commit]
-        
-      # Export requirements files
-      - id: export-requirements
-        name: Export requirements files
-        entry: python
-        args: ["-c", "import subprocess; subprocess.run(['poetry', 'export', '-f', 'requirements.txt', '--output', 'dev/requirements/requirements.main.txt']); subprocess.run(['poetry', 'export', '-f', 'requirements.txt', '--output', 'dev/requirements/requirements.dev.txt', '--with', 'dev'])"]
-        language: python
-        pass_filenames: false
-        always_run: true
-        stages: [pre-commit]
       
         # Bandit security check for llm_etl_pipeline
       - id: bandit-llm_etl_pipeline

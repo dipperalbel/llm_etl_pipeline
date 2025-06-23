@@ -83,18 +83,17 @@ def _get_template(
 
     with open(template_path, "r", encoding="utf-8") as file:
         template_text = file.read().strip()
-        assert (
-            template_text
-        ), "Template text is empty."  # Added specific message to assert
+        if not template_text:
+            raise ValueError("Template text is empty.")
 
     if template_extension == "j2":
         # Validate template text
-        assert _are_prompt_template_brackets_balanced(
-            template_text
-        ), "Prompt template brackets are not balanced."
-        assert not bool(
-            re.search(r"(\r\n|\r|\n){3,}", template_text)
-        ), "Too many newlines in template."
+        brackets_balanced = _are_prompt_template_brackets_balanced(template_text)
+        if not brackets_balanced:
+            raise ValueError("Prompt template brackets are not balanced.")
+
+        if bool(re.search(r"(\r\n|\r|\n){3,}", template_text)):
+            raise ValueError("Too many newlines in template.")
         template = _setup_jinja2_template(template_text)
     elif template_extension == "txt":
         template = template_text
@@ -201,7 +200,7 @@ def _contains_jinja2_tags(text: str) -> bool:
         bool: `True` if the text contains Jinja2 tags or dynamic content;
               `False` otherwise (i.e., if it's purely static text).
     """
-    env = Environment()
+    env = Environment(autoescape=True)
     parsed = env.parse(text)
     # If any node in the top-level body is not TemplateData (and isn't an Output
     # wrapping only TemplateData), it indicates the presence of Jinja2 tags,

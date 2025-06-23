@@ -88,6 +88,7 @@ commitizen = "^4.5.1"
 sphinx-sitemap = "^2.6.0"
 pytest-recording = "^0.13.4"
 furo = "^2024.8.6"
+bandit = "^1.8.5"
 
 [tool.black]
 line-length = 88
