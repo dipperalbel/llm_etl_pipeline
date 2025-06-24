@@ -133,8 +133,7 @@ class Pipeline(BaseModel):
                                           the pipeline processing.
 
         Returns:
-            pd.DataFrame: The final DataFrame after all functions in the pipeline
-                          have been successfully executed.
+            pd.DataFrame: The final DataFrame after all functions in the pipeline have been successfully executed.
 
         Raises:
             TypeError: If any function in the pipeline returns a value that is
