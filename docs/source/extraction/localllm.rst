@@ -1,3 +1,4 @@
+==========================
 LocalLLM
 ==========================
 
@@ -47,12 +48,9 @@ This example demonstrates how to initialize ``LocalLLM`` and use its
 
 
 API Reference
--------------
+--------------
 
-.. autoclass:: llm_etl_pipeline.extraction.LocalLLM
-   :members: extract_information
+.. autoclass:: llm_etl_pipeline.LocalLLM
+   :members:
+   :undoc-members:
    :show-inheritance:
-   :no-undoc-members:
-   :no-private-members:
-   :no-special-members:
-   :exclude-members: args, name, cache, verbose, callbacks, tags, metadata, custom_get_token_ids, callback_manager, rate_limiter, disable_streaming, model, extract_reasoning, mirostat, mirostat_eta, mirostat_tau, num_ctx, num_gpu, num_thread, num_predict, repeat_last_n, repeat_penalty, temperature, seed, stop, tfs_z, top_k, top_p, format, keep_alive, base_url, client_kwargs, async_client_kwargs, sync_client_kwargs, default_system_prompt # Exclude inherited Ollama parameters if they are not explicitly customized or relevant for LocalLLM's unique purpose.

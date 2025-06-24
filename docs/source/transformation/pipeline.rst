@@ -1,5 +1,4 @@
-.. -*- mode: rst -*-
-
+==========================
 Pipeline
 ==========================
 
@@ -63,12 +62,9 @@ and execute it on a pandas DataFrame.
 
 
 API Reference
--------------
+--------------
 
-.. autoclass:: llm_etl_pipeline.transformation.Pipeline
+.. autoclass:: llm_etl_pipeline.Pipeline
+   :members:
+   :undoc-members:
    :show-inheritance:
-   :members: run
-   :no-undoc-members:
-   :no-private-members: 
-   :no-special-members: 
-   :exclude-members: model_config

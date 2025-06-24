@@ -1,5 +1,4 @@
-.. -*- mode: rst -*-
-
+==========================
 Document
 ==========================
 
@@ -15,7 +14,7 @@ Let's illustrate how to create a Document and use its methods.
 
     # Create a simple document with raw text
     doc_raw_text = Document(
-        raw_text="This is the first sentence. This is the second sentence.\n\n"
+        raw_text="This is the first sentence. This is the second sentence.\n\n"\
                  "This is a new paragraph. Another sentence in the same paragraph."
     )
 
@@ -37,10 +36,11 @@ Let's illustrate how to create a Document and use its methods.
 
 
 API Reference
--------------
+--------------
 
-.. autoclass:: llm_etl_pipeline.extraction.Document
-   :members: get_paras_or_sents_raw_text, sentences
-   :undoc-members: model_post_init
+.. autoclass:: llm_etl_pipeline.Document
+   :members:
+   :undoc-members:
    :show-inheritance:
+
 

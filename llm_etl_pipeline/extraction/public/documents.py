@@ -59,9 +59,6 @@ class Document(BaseModel):
         sat_model_id (SaTModelId): The identifier for the SaT model to be used for
                                    segmentation (both paragraphs and sentences, if "sat" mode is used).
                                    Defaults to "sat-3l-sm".
-        regex_pattern (Optional[NonEmptyStr]): A regular expression pattern that can
-                                               be used for filtering paragraphs or sentences.
-                                               Defaults to None.
     """
 
     raw_text: Optional[NonEmptyStr] = Field(default=None)
@@ -70,7 +67,6 @@ class Document(BaseModel):
         default="empty_line"
     )
     sat_model_id: SaTModelId = Field(default="sat-3l-sm")
-    regex_pattern: Optional[NonEmptyStr] = Field(default=None)
 
     def __setattr__(self, name: str, value: Any) -> None:
         """

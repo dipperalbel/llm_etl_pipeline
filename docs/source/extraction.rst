@@ -1,6 +1,6 @@
-=============================
+===========================================
 Data Extraction Flow and Temporary Storage
-=============================
+===========================================
 
 The core of this solution for information extraction relies on a multi-stage process
 leveraging local Large Language Models (LLMs) for specific data points. Our

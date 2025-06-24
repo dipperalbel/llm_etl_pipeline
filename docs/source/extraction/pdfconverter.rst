@@ -1,5 +1,4 @@
-.. -*- mode: rst -*-
-
+==========================
 PdfConverter
 ==========================
 
@@ -24,11 +23,11 @@ Let's demonstrate how to convert a PDF document to plain text using ``PdfConvert
     print(extracted_text)
 
 API Reference
--------------
+--------------
 
-.. autoclass:: llm_etl_pipeline.extraction.PdfConverter
-   :members: convert_to_text
+.. autoclass:: llm_etl_pipeline.PdfConverter
+   :members:
+   :undoc-members:
    :show-inheritance:
-   :no-undoc-members:
-   :no-private-members:
-   :no-special-members:
+   :exclude-members: _doc_converter
+

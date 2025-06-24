@@ -37,5 +37,5 @@ Running the Extraction Process
 
 .. warning::
 
-    MAKE SURE THAT THE INPUT FOLDER CONTAINS THE CALL FOR PROPOSAL PDFS
-    (the PDFs should be like AMIF-2024-TF2-AG-INFO-01_separator_call-...).
+    Ensure the input folder contains the call for proposal PDFs. 
+    PDF filenames must include the word 'call' (e.g., AMIF-2024-TF2-AG-INFO-01_separator_call-...).

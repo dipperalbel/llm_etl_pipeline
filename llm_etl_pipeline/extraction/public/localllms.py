@@ -50,25 +50,12 @@ class LocalLLM(ChatOllama):
             that sets the context or instructions for the LLM. If not provided
             during initialization, it will be loaded from a template. This attribute
             cannot be changed once populated.
-        _parser (PydanticOutputParser): A private attribute that holds the
-            PydanticOutputParser instance, configured to parse responses into
-            `MonetaryInformationList` objects.
     """
 
     default_system_prompt: Optional[NonEmptyStr] = Field(default=None)
     _parser: PydanticOutputParser = PrivateAttr()
 
     def __init__(self, *args: Any, **kwargs: Any):
-        """
-        Initializes the LocalLLM instance, extending ChatOllama.
-
-        This constructor calls the parent `ChatOllama` constructor and
-        initializes the Pydantic output parser for `MonetaryInformationList`.
-
-        Args:
-            *args: Arbitrary positional arguments passed to the `ChatOllama` parent constructor.
-            **kwargs: Arbitrary keyword arguments passed to the `ChatOllama` parent constructor.
-        """
         super().__init__(*args, **kwargs)
 
     def __setattr__(self, name: str, value: Any) -> None:
@@ -208,7 +195,7 @@ class LocalLLM(ChatOllama):
         self,
         input_document: NonEmptyListStr,
         llm_extraction_pipeline: RunnableLambda,
-        max_items_to_analyze_per_call: int = 6,
+        max_items_to_analyze_per_call: int = 4,
     ) -> dict[str, list[dict[str, Any]]]:
         """
         Processes a list of text items (e.g., sentences or paragraphs) in batches
@@ -226,7 +213,7 @@ class LocalLLM(ChatOllama):
                                                       configured for extraction.
             max_items_to_analyze_per_call (int): The maximum number of text items
                                                  to include in a single LLM call (batch size).
-                                                 Defaults to 6.
+                                                 Defaults to 4.
 
         Returns:
             dict[str, list[dict[str, Any]]]: A dictionary containing the aggregated
@@ -300,17 +287,16 @@ class LocalLLM(ChatOllama):
         Args:
             list_elem (NonEmptyListStr): A non-empty list of text strings (e.g., sentences or paragraphs)
                                          to be analyzed.
-            extraction_type (ExtractionType): The type of information to extract (e.g., 'money', 'entity').
+            extraction_type (ExtractionType): The type of information to extract. Must be 'money' or 'entity'.
                                               Defaults to 'money'.
-            reference_depth (ReferenceDepth): The granular level of text being analyzed
-                                                (e.g., 'sentences' or 'paragraphs'). Defaults to 'sentences'.
+            reference_depth (ReferenceDepth): The granular level of text being analyzed.
+                                                Must be 'sentences' or 'paragraphs'. Defaults to 'sentences'.
             max_items_to_analyze_per_call (int): The maximum number of text items
                                                  to include in a single LLM call (batch size).
-                                                 Defaults to 4.
+                                                 Defaults to 4. Must be greater than 0.
 
         Returns:
-            dict[str, list[dict[str, Any]]]: A dictionary containing the final
-                                             aggregated extraction results.
+            dict[str, list[dict[str, Any]]]: A dictionary containing the final aggregated extraction results.
         """
         logger.info(
             f"Starting result extraction with {len(list_elem)} elements, "

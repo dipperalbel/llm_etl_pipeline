@@ -1,5 +1,6 @@
+===============================
 Project Structure and Overview
-=================
+===============================
 
 This project is organized into several key directories and files to facilitate its ETL (Extract, Transform, Load) operations, documentation, and development practices.
 

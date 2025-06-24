@@ -31,12 +31,13 @@ if __name__ == "__main__":
     ####################### IMPORTANT #######################
     # SET THE LOCAL LLM MODEL
     # FOR LLM MODEL, I USED phi4. IT GIVES GOOD AND CONSISTENT RESULTS.
+    # FOR ENTITY, I USED gemma3:27b. IT GIVES GOOD AND CONSISTENT RESULTS.
     money_llm_model="phi4:14b"
     entity_llm_model="gemma3:27b"
     #########################################################
     # LOAD PDF CONVERTER OBVJECT
     pdf_converter = PdfConverter()
-    #DEFINE PARAMETERS FOR THE EXTRACTION OF MONEY AND ENTITY RELATED INFORMATION. IMPORTANT STRINGS FOR MONEY ARE: (budget, grant,...). IMPORTANT STRINGS FOR ENTITY ARE ( consortium, entities, ...)
+    #DEFINE PARAMETERS FOR THE EXTRACTION OF MONEY AND ENTITY RELATED INFORMATION. IMPORTANT STRINGS FOR MONEY ARE: (eur with digits,...). IMPORTANT STRINGS FOR ENTITY ARE ( consortium, entities, ...)
     #FOR THE REGEX, WE USE re.compile(..., re.DOTALL | re.IGNORECASE ) and re.match(...).
     reference_depth='paragraphs'
     paragraph_segmentation_mode='empty_line'
@@ -47,14 +48,15 @@ if __name__ == "__main__":
     top_p=0.3
     seed=42
     max_tokens=4096
-    #NUMBER OF PARAGRAPHS TO ANALYZE PER LLM CALL. LOWER MEANS MORE GRANULAR ANALYSIS.
+    #NUMBER OF PARAGRAPHS TO ANALYZE PER LLM CALL. LOWER MEANS MORE GRANULAR ANALYSIS. 
+    # FOR ENTITY, BECAUSE THE TABLE IS A SINGLE PARAGRAPH, THE PARAM IS SET TO ONE.
     money_paragraphs_to_analyze=3
     entity_paragraphs_to_analyze=1
     #INITIALIZE EMPTY LIST WHERE WE WILL STORE THE RESULTS OF THE LLM EXTRACTION PROCESS
     money_json_result_from_llm_extaction = []
     entiy_json_result_from_llm_extaction = []
     
-    logger.info(f"================STARTING EXTRACTION PIPELINE================")
+    logger.info("================STARTING EXTRACTION PIPELINE================")
     # First, get the filtered list of PDFs
     selected_pdfs = get_filtered_fully_general_series_call_pdfs(input_doc_path)
 
@@ -68,18 +70,17 @@ if __name__ == "__main__":
             raise ValueError(f"No PDF files matching the criteria found in '{input_doc_path}'.")
     else:
         extracted_titles=selected_pdfs.copy()
-    
+    # LOOP FOR EACH FOUND CALL FOR PROPOSAL PDF
     for pdf_path, title in extracted_titles.items():
         logger.info(f"EXTRACTION OF MONEY AND ENTITY INFORMATION FROM: {pdf_path.name}. PROJECT ID: {title}")
-        
         #CONVERT PDF FILE AT PDF_PATH INTO STRING
         text_output = pdf_converter.convert_to_text(pdf_path)
         #CREATE DOCUMENT OBJECT. IT WILL AUTOMATICALLY SEGMENT THE WHOLE STRING INTO SENTENCES AND PARGRAPHS.
         doc=Document(raw_text=text_output,paragraph_segmentation_mode=paragraph_segmentation_mode)
-        #FROM DOCUMENT GET THE PARAGRAPHS (OR SENTENCES) THAT MATCH THE REGEX.
+        #FROM DOCUMENT GET THE PARAGRAPHS (OR SENTENCES) THAT MATCH THE REGEX. DO THIS OPERATION FOR THE MONEY REGEX AND ENTITY REGEX
         money_list_sents=doc.get_paras_or_sents_raw_text(reference_depth=reference_depth,regex_pattern=money_regex).copy()
         entity_list_sents=doc.get_paras_or_sents_raw_text(reference_depth=reference_depth,regex_pattern=entity_regex).copy()
-        #CREATE LLM OBJECT
+        #CREATE LLM OBJECT.
         money_llm=LocalLLM(model=money_llm_model,temperature=temperature,top_p=top_p,seed=seed,max_tokens=max_tokens)
         entity_llm=LocalLLM(model=entity_llm_model,temperature=temperature,top_p=top_p,seed=seed,max_tokens=max_tokens)
         #EXTRACT MONEY AND ENTITY INFORMATION FROM THE PARAGRAPHS.
@@ -96,7 +97,7 @@ if __name__ == "__main__":
     with open('entity_result.json', 'w') as f:
         json.dump(entiy_json_result_from_llm_extaction, f,indent=2)
 
-    logger.info(f"================STARTING TRANSFORMATION PIPELINE================")
+    logger.info("================STARTING TRANSFORMATION PIPELINE================")
     #LOAD DF FROM JSON
     money_df=load_df_from_json('money_result.json')
     entity_df=load_df_from_json('entity_result.json')
@@ -107,7 +108,7 @@ if __name__ == "__main__":
         verify_no_missing_data,
         # VERIFY THAT THERE ARE NO NEGATIVE NUMBERS
         verify_no_negatives,
-        # VERIFY THAT THERE ARE NO ''
+        # VERIFY THAT THERE ARE NO EMPTY STRINGS
         verify_no_empty_strings,
         # VERIFY THAT THE VALUE COLUMNS HAS ONLY NUMBERS
         partial(check_numeric_columns, columns_to_check=['value']),
@@ -124,7 +125,7 @@ if __name__ == "__main__":
         # DROP ANY VALUE THAT DOES NOT SATISFY THE REGEX IN EITHER ORIGINAL_SENTENCE AND CONTEXT. IF A VALUE SATISFY THE REGEX IN ORIGINAL_SENTENCE OR CONTEXT, WE KEEP IT
         partial(drop_rows_if_no_column_matches_regex, columns_to_check=['original_sentence', 'context'], regex_pattern=r"call|budget|grant|amif"),
         # THERE ARE CASES WHERE IN THE SAME DOCUMENT, WE HAVE DUPLICATED MONEY VALUE THAT MIGHT OR NOT REFER TO THE SAME SEMANTIC CONTEXT. WE TRY AND DROP THOSE DUPLICATES IF THEY ARE SEMANTICALLY SIMILAR ABOVE A CERTAIN THRESHOLD.
-        # THE THRESHOLD REFERS TO THE COSINE DISTANCE. THE HIGHER THE THRESHOLD, THE MORE MERGING FREQUENCY. THE LOWER THE THRESHOLD, THE LESS MERGING FREQUENCY.
+        # THE THRESHOLD REFERS TO THE COSINE DISTANCE. THE HIGHER THE THRESHOLD, THE HIGHER THE MERGING FREQUENCY. THE LOWER THE THRESHOLD, THE LESS MERGING FREQUENCY.
         partial(remove_semantic_duplicates, groupby_columns=['document_id', 'value'], target_column="context",threshold = 0.5),
         ])
     #DEFINE ENTITY PIPELINE. EACH FUNCTION OF THE PIPELINE MUST HAVE AS ITS FIRST ARGUMENT A PANDAS DATAFRAME
@@ -148,12 +149,12 @@ if __name__ == "__main__":
     # Debugging: Stampa i tipi di dato delle colonne chiave dopo la conversione
     ######## LOAD
     # SAVE THE RESULT TO CSV
-    logger.info(f"================STARTING LOAD PIPELINE================")
-    logger.info(f"STORING THE RESULT OF THE TRANSFORMATION PIPELINE INTO A CSV")
-    #WE ARE GOING TO STORE THE MERGE OF THE RESULTS OF THE TWO TRANSFORMATION PIPELINES INTO A CSV. WE ALSO STORE THE RESULT OF EACH TRANSFROMATION PIPELINE INTO A CSV.
+    logger.info("================STARTING LOAD PIPELINE================")
+    logger.info("STORING THE RESULT OF THE TRANSFORMATION PIPELINE INTO A CSV")
+    #WE ARE GOING TO STORE THE RESULT OF EACH TRANSFROMATION PIPELINE INTO A CSV.
     money_result_df.to_csv('etl_money_result.csv')
     entity_result_df.to_csv('etl_entity_result.csv')
-    logger.success(f"ETL PROCESS FINISHED")
+    logger.success("ETL PROCESS FINISHED")
 
 
 

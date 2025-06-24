@@ -1,5 +1,5 @@
 """
-This module defines the `PdfConverter` Pydantic model, providing a robust
+The `PdfConverter` class provides a robust
 interface for converting PDF documents to text.
 
 It encapsulates the `docling` library's `DocumentConverter` to offer
@@ -37,8 +37,10 @@ class PdfConverter(BaseModel):
     `DocumentConverter` instance.
 
     This class provides a streamlined interface for converting PDF documents
-    into text, with configurable options for OCR, table structure detection,
+    into text with configurable table structure detection,
     and cell matching during the conversion process.
+
+    For the moment, the attributes are frozen.
 
     Attributes:
         do_ocr (bool):
@@ -51,9 +53,6 @@ class PdfConverter(BaseModel):
         do_cell_matching (bool):
             Indicates whether to perform cell matching for detected tables.
             Defaults to `False`. This field is `frozen=True`.
-        _doc_converter (DocumentConverter):
-            A private attribute holding the internal instance of `DocumentConverter`,
-            configured based on the Pydantic fields.
     """
 
     # Pydantic fields for configuration options
@@ -79,17 +78,6 @@ class PdfConverter(BaseModel):
     _doc_converter: DocumentConverter = PrivateAttr()
 
     def __init__(self, **data: Any):  # Added Any type hint for clarity
-        """
-        Constructor for the PdfConverter class.
-
-        Initializes the Pydantic model with the provided data and then
-        configures the internal `DocumentConverter` instance based on these
-        settings.
-
-        Args:
-            **data (Any): Arbitrary keyword arguments corresponding to the
-                          Pydantic fields (e.g., `do_ocr`, `do_table_structure`, `do_cell_matching`).
-        """
         super().__init__(**data)  # Call to BaseModel constructor
 
         # Configure the internal DocumentConverter based on Pydantic fields

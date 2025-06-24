@@ -1,5 +1,6 @@
+==================
 Solution Overview
-============
+==================
 
 During the analysis of the AMIF grant project PDFs, it became clear that they do not contain project-specific **Technology Readiness Level (TRL)** information. While TRL is a standard concept in Horizon Europe projects, the documents only provided generic definitions (TRL 1 to 9) without practical application to the projects themselves. Our attempts to extract any TRL data, even using advanced LLM AI models like Gemini, were unsuccessful and often resulted in hallucinatory outputs. This outcome is consistent with our understanding from both internet research and Gemini, which suggests that TRL — a metric primarily focused on technological maturity — is not typically indicated in AMIF grant projects, given their social rather than technological nature.
 
