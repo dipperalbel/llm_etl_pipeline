@@ -151,7 +151,7 @@ Instructions on how to get your project up and running.
     Begin by cloning the project's Git repository to your local machine:
     ```bash
     git clone https://github.com/dipperalbel/llm_etl_pipeline
-    cd your-project-name
+    cd llm_etl_pipeline
     ```
 
 2.  **Install dependencies with Poetry:**
